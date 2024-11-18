@@ -1,0 +1,50 @@
+﻿@page "/Login"
+@using MyQuizApp.Infra.Users
+@layout AuthLayout
+
+<h2>Login</h2>
+<EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync">
+    <div class="input-field">
+        <input type="text" name="username" id="username"
+               placeholder="Enter Your Username">
+        <div class="underline"></div>
+    </div>                                                                    
+    <div class="input-field">
+        <input type="password" name="password" id="password"
+               placeholder="Enter Your Password">
+        <div class="underline"></div>
+    </div>
+
+    <input type="submit" value="Continue">
+</EditForm>
+
+<div class="footer">
+    <span>Or Connect With Social Media</span>
+    <div class="social-fields">
+        <div class="social-field twitter">
+            <a href="#">
+                <i class="fab fa-twitter"></i>
+                Sign in with Twitter
+            </a>
+        </div>
+        <div class="social-field facebook">
+            <a href="#">
+                <i class="fab fa-facebook-f"></i>
+                Sign in with Facebook
+            </a>
+        </div>
+    </div>
+</div>   
+
+
+@code{
+
+    public LoginRequests Requests { get; set; } = new LoginRequests();
+
+
+    private Task LoginAsync(EditContext arg)
+    {
+        throw new NotImplementedException();
+    }
+
+}

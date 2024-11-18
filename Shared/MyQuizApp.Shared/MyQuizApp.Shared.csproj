@@ -6,9 +6,4 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\MyQuizApp.Shared\MyQuizApp.Shared.csproj" />
-      <ProjectReference Include="..\..\Shared\MyQuizApp.Shared\MyQuizApp.Shared.csproj" />
-    </ItemGroup>
-
 </Project>
