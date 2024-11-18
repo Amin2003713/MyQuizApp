@@ -13,15 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<AuthService>();
 
-builder.Services.AddCors(c =>
-{
-    c.AddDefaultPolicy(policy =>
-    {
-        policy.AllowAnyHeader();
-        policy.AllowAnyMethod();
-        policy.AllowAnyOrigin();
-    });
-});
+
 
 builder.Services.AddDbContext<Context>(a =>
 {
@@ -70,6 +62,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCors(policyBuilder => policyBuilder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
 app.ConfigureAutomaticMigrations();
 
 app.UseHttpsRedirection();
@@ -78,7 +72,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 
 app.MapAuthApis();

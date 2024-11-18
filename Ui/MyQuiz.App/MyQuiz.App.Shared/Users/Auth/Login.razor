@@ -5,12 +5,7 @@
  @inject  IAuthClient Auth
 
 <h1>Login</h1>
-
- <div class="right-side">
-     @if (Errors is not null)
-     {
-         <div class="blazor-error-boundary">@Errors</div>
-     }
+    
      <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync" FormName="LoginForm">
          <DataAnnotationsValidator/>
 
@@ -26,8 +21,12 @@
          </div>
          <button type="submit">Login</button>         
 
-     </EditForm>
- </div>
+     </EditForm>       
+
+ @if (Errors is not null)
+{
+    <div class="blazor-error-boundary">@Errors</div>
+}
 
 
 @code{
@@ -44,6 +43,7 @@
             if (result.HasError)
                 Errors = result.Error;
 
+            NavigationManager.NavigateTo("/");
         }
         catch(Exception e)
         {
