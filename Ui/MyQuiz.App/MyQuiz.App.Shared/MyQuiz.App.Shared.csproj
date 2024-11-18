@@ -4,14 +4,27 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
     </PropertyGroup>
 
     <ItemGroup>
         <SupportedPlatform Include="browser"/>
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup>                    
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Users\Auth\Login.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Infra\MyQuizApp.Infra\MyQuizApp.Infra.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="wwwroot\AuthAssets\" />
     </ItemGroup>
 
 </Project>

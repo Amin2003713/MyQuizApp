@@ -1,0 +1,45 @@
+﻿@page "/Login"
+@using MyQuiz.App.Shared.Layout
+@using MyQuizApp.Infra.Users
+@layout AuthLayout
+
+
+<div class="left-side">
+</div>
+
+<div class="right-side">
+    <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync">
+        <DataAnnotationsValidator/>
+        <div class="form-container">
+            <div class="mb-3">
+                <label class="form-label">Email:</label>
+                <InputText @bind-Value="Requests.Email" DisplayName="Email"/>
+                <ValidationMessage For="() => Requests.Email"/>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password:</label>
+                <InputText @bind-Value="Requests.Password" DisplayName="Password"/>
+                <ValidationMessage For="() => Requests.Password"/>
+            </div>
+        </div>
+
+        <button type="submit" class="login-btn">Sign in</button>
+        @* <div class="links"> *@
+        @*     <a href="#">Forgot password?</a> *@
+        @*     <a href="#">Do not have an account?</a> *@
+        @* </div> *@
+    </EditForm>
+</div>
+
+@code{
+
+    public LoginRequests Requests { get; set; } = new LoginRequests();
+
+
+    private Task LoginAsync(EditContext arg)
+    {
+        throw new NotImplementedException();
+    }
+
+}
