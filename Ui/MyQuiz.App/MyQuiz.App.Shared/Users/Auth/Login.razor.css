@@ -88,6 +88,33 @@ input {
     padding: 2px;
 }
 
+/* OR */
+
+.or {
+    position: relative;
+    text-align: center;
+    margin-bottom: 24px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.or::before,
+.or::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 40%;
+    height: 1px;
+    background: #000;
+}
+
+.or::before {
+    left: 0;
+}
+
+.or::after {
+    right: 0;
+}
 
 
 input:focus {

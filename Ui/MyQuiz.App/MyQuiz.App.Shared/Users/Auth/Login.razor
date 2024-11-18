@@ -8,6 +8,24 @@
 </div>
 
 <div class="right-side">
+
+    <div class="btn-group">
+        <button class="btn">
+            <img class="logo"
+                 src="AuthAssets/Google.png"
+                 alt=""/>
+            <span>Sign in with Google</span>
+        </button>
+        <button class="btn">
+            <img class="logo"
+                 src="AuthAssets/Apple.png"
+                 alt=""/>
+            <span>Sign in with Apple</span>
+        </button>
+    </div>
+
+    <div class="or">OR</div>
+
     <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync">
         <DataAnnotationsValidator/>
         <div class="form-container">
