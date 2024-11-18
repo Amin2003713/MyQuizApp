@@ -2,5 +2,5 @@
 
 public static class AuthRouts
 {
-    public static string Login = "api/users/login";
+    public const string Login = "/api/users/login";
 }

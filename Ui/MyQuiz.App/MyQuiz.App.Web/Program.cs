@@ -10,7 +10,7 @@ builder.Services.AddRazorComponents()
 
 // Add device-specific services used by the MyQuiz.App.Shared project
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
-
+builder.Services.AddRefitConfig();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

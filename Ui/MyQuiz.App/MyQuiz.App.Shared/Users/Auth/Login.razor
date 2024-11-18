@@ -2,29 +2,16 @@
 @using MyQuiz.App.Shared.Layout
 @using MyQuizApp.Infra.Users
 @layout AuthLayout
+ @inject  IAuthClient Auth
 
-
-<div class="left-side">
-</div>
+ <div class="left-side">
+     @if (Errors is not null)
+     {
+         <div class="errors">@Errors</div>
+     }
+ </div>
 
 <div class="right-side">
-
-    <div class="btn-group">
-        <button class="btn">
-            <img class="logo"
-                 src="AuthAssets/Google.png"
-                 alt=""/>
-            <span>Sign in with Google</span>
-        </button>
-        <button class="btn">
-            <img class="logo"
-                 src="AuthAssets/Apple.png"
-                 alt=""/>
-            <span>Sign in with Apple</span>
-        </button>
-    </div>
-
-    <div class="or">OR</div>
 
     <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync">
         <DataAnnotationsValidator/>
@@ -53,11 +40,24 @@
 @code{
 
     public LoginRequests Requests { get; set; } = new LoginRequests();
+    private string? Errors = null!;
 
-
-    private Task LoginAsync(EditContext arg)
+    private async Task LoginAsync(EditContext arg)
     {
-        throw new NotImplementedException();
-    }
+        try
+        {
+            var result = await Auth.Login(Requests);
+
+            if (result.HasError)
+                Errors = result.Error;
+
+        }
+        catch(Exception e)
+        {
+            Errors = e.ToString();
+        }
+        return;
+
+    }                       
 
 }
