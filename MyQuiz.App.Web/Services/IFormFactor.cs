@@ -1,17 +1,16 @@
 using MyQuizApp.Infra.Services;
 
-
-namespace MyQuiz.App.Services;
+namespace MyQuiz.App.Web.Services;
 
 public class FormFactor : IFormFactor
 {
     public string GetFormFactor()
     {
-        return DeviceInfo.Idiom.ToString();
+        return "WebAssembly";
     }
 
     public string GetPlatform()
     {
-        return DeviceInfo.Platform.ToString() + " - " + DeviceInfo.VersionString;
+        return Environment.OSVersion.ToString();
     }
 }

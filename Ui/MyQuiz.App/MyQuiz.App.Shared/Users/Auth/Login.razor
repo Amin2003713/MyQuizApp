@@ -4,41 +4,34 @@
 @layout AuthLayout
  @inject  IAuthClient Auth
 
- <div class="left-side">
+<h1>Login</h1>
+
+ <div class="right-side">
      @if (Errors is not null)
      {
-         <div class="errors">@Errors</div>
+         <div class="blazor-error-boundary">@Errors</div>
      }
+     <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync" FormName="LoginForm">
+         <DataAnnotationsValidator/>
+
+         <div class="row">
+             <label class="form-label">Email:</label>
+             <InputText @bind-Value="Requests.Email" DisplayName="Email"/>
+             <ValidationMessage For="() => Requests.Email"/>
+         </div>
+         <div class="row">
+             <label class="form-label">Password:</label>
+             <InputText @bind-Value="Requests.Password" DisplayName="Password"/>
+             <ValidationMessage For="() => Requests.Password"/>
+         </div>
+         <button type="submit">Login</button>         
+
+     </EditForm>
  </div>
 
-<div class="right-side">
-
-    <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync">
-        <DataAnnotationsValidator/>
-        <div class="form-container">
-            <div class="mb-3">
-                <label class="form-label">Email:</label>
-                <InputText @bind-Value="Requests.Email" DisplayName="Email"/>
-                <ValidationMessage For="() => Requests.Email"/>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">Password:</label>
-                <InputText @bind-Value="Requests.Password" DisplayName="Password"/>
-                <ValidationMessage For="() => Requests.Password"/>
-            </div>
-        </div>
-
-        <button type="submit" class="login-btn">Sign in</button>
-        @* <div class="links"> *@
-        @*     <a href="#">Forgot password?</a> *@
-        @*     <a href="#">Do not have an account?</a> *@
-        @* </div> *@
-    </EditForm>
-</div>
 
 @code{
-
+    [SupplyParameterFromForm(FormName = "LoginForm")]
     public LoginRequests Requests { get; set; } = new LoginRequests();
     private string? Errors = null!;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using MyQuiz.App.Shared.Services;
 using MyQuiz.App.Services;
+using MyQuizApp.Infra.Services;
 
 namespace MyQuiz.App;
 

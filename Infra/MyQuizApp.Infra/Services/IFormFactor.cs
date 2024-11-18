@@ -2,14 +2,14 @@ using Microsoft.Extensions.DependencyInjection;
 using MyQuizApp.Infra.Users;
 using Refit;
 
-namespace MauiApp3.Shared.Services
+namespace MyQuizApp.Infra.Services;
+
+public interface IFormFactor
 {
-    public interface IFormFactor
-    {
-        public string GetFormFactor();
-        public string GetPlatform();
-    }
+    public string GetFormFactor();
+    public string GetPlatform();
 }
+
 
 
 public static class Extentions
