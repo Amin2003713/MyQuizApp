@@ -10,4 +10,6 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
       builder.Services.AddRefitConfig();
+
+
 await builder.Build().RunAsync();
