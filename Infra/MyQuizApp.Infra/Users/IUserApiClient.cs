@@ -4,10 +4,18 @@ using Refit;
 
 namespace MyQuizApp.Infra.Users;
 
-public interface IAuthClient
+public interface IUserApiClient
 {
     [Post(AuthRouts.Login)]
     Task<LoginResponse> Login(LoginRequests requests);
 }
+
+public static class UserConst
+{
+    public static string UserInfo { get; set; } = "UserInfo";
+    public static string AuthType { get; set; } = "QuizApplication";
+}
+
+
 
 

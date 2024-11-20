@@ -19,6 +19,10 @@ public class AuthService(IPasswordHasher<User> passwordHasher, Context db)
         if (user is null)
             return new LoginResponse( null , "Not Found" , true);
 
+        if(user.IsActive is false )
+            return new LoginResponse(null, "unauthrozied Access ples Active ur acocunt ", true);
+             
+
         var passResult = passwordHasher.VerifyHashedPassword(user , user.PasswordHash ,  loginRequest.Password);
 
         if(passResult == PasswordVerificationResult.Failed)
@@ -26,7 +30,17 @@ public class AuthService(IPasswordHasher<User> passwordHasher, Context db)
 
         var token = CreateToken(user);
 
-        return new LoginResponse(token, null, false);
+        return new LoginResponse(new LoggedUser()
+        {
+            Email = user.Email,
+            UserRoles = user.UserRoles , 
+                               Name = user.Name,
+                               Id = user.Id,
+                               Phone = user.Phone,
+                               PasswordHash = user.PasswordHash,
+                               Token = token,
+            IsActive = user.IsActive
+        }, null, false);
     }
 
 

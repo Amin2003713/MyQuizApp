@@ -1,8 +1,8 @@
 ﻿@page "/Login"
 @using MyQuiz.App.Shared.Layout
 @using MyQuizApp.Infra.Users
+@using MyQuizApp.Infra.Users.Response
 @layout AuthLayout
- @inject  IAuthClient Auth
 
 <h1>Login</h1>
     
@@ -38,7 +38,7 @@
     {
         try
         {
-            var result = await Auth.Login(Requests);
+            var result = new  LoginResponse(null , null , false );
 
             if (result.HasError)
                 Errors = result.Error;

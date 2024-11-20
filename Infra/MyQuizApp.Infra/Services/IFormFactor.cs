@@ -16,7 +16,7 @@ public static class Extentions
 {
     public static void AddRefitConfig(this IServiceCollection services)
     {
-        services.AddRefitClient<IAuthClient>().ConfigureHttpClient(client =>
+        services.AddRefitClient<IUserApiClient>().ConfigureHttpClient(client =>
         { 
             client.Timeout = TimeSpan.FromSeconds(120);
             client.BaseAddress = new Uri("https://localhost:7296");
