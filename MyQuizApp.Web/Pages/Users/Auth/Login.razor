@@ -18,14 +18,18 @@
 
 @code {
 
-    public string Errors { get; set; } = null;
+    private string Errors { get; set; } = null!;
 
     private async Task Callback(LoginRequests requests)
     {
         var result = await AuthState.LoginAsync(requests);
 
         if (result.HasError)
+        {
             Errors = result.Error ?? "";
+            StateHasChanged();
+            return;
+        }
 
         NavigationManager.NavigateTo("/");
         

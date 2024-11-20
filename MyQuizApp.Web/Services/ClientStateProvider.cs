@@ -18,7 +18,8 @@ private Task<AuthenticationState> _authenticationStateTask  = Task.FromResult(ne
 
 
 public LoggedUser? LoggedUser { get; private set; }
-     public bool IsLoggedIn => LoggedUser != null || this.LoggedUser?.Id != Guid.Empty;
+public bool IsLoggedIn => LoggedUser != null || this.LoggedUser?.Id != Guid.Empty;
+public bool IsInitialized = false;
 
 
     public async Task<ClaimsPrincipal> GetAuthenticationStateProviderUserAsync()
@@ -70,10 +71,9 @@ public LoggedUser? LoggedUser { get; private set; }
         else
         {
             LoggedUser = user;
-
             SetAuthenticatedUser(user);
         }
-
+        IsInitialized = true;
     }
 
 

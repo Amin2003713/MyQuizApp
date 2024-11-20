@@ -9,13 +9,13 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<MyQuizApp.Web.App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
-builder.Services.AddScoped<ClientStateProvider>();
-builder.Services.AddScoped<AuthenticationStateProvider>(provider => provider.GetRequiredService<ClientStateProvider>());
-builder.Services.AddScoped<IFormFactor, FormFactor>();
+builder.Services.AddSingleton<ClientStateProvider>();
+builder.Services.AddSingleton<AuthenticationStateProvider>(provider => provider.GetRequiredService<ClientStateProvider>());
+builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddRefitConfig();
 
 await builder.Build().RunAsync();
