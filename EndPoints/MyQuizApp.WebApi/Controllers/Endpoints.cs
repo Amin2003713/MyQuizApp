@@ -2,6 +2,7 @@ using Azure.Core;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using MyQuizApp.Infra.Users;
+using MyQuizApp.Infra.Users.Requests;
 using MyQuizApp.Infra.Users.Routs;
 using MyQuizApp.WebApi.Services;
 

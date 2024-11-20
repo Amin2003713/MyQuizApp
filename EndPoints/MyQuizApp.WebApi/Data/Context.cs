@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using MyQuizApp.Domain.Categories;
+using MyQuizApp.Domain.Quizzes;
 using MyQuizApp.Domain.Users;
 
 namespace MyQuizApp.WebApi.Data;

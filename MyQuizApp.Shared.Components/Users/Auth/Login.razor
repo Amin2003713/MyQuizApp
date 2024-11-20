@@ -1,0 +1,58 @@
+﻿@page "/Login"
+@using Microsoft.AspNetCore.Components.Forms
+@using MyQuizApp.Infra.Users
+@using MyQuizApp.Infra.Users.Requests
+@using MyQuizApp.Infra.Users.Response
+@using MyQuizApp.Shared.Components.Layout
+@layout AuthLayout
+
+<h1>Login</h1>
+    
+     <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync" FormName="LoginForm">
+         <DataAnnotationsValidator/>
+
+         <div class="row">
+             <label class="form-label">Email:</label>
+             <InputText @bind-Value="Requests.Email" DisplayName="Email"/>
+             <ValidationMessage For="() => Requests.Email"/>
+         </div>
+         <div class="row">
+             <label class="form-label">Password:</label>
+             <InputText @bind-Value="Requests.Password" DisplayName="Password"/>
+             <ValidationMessage For="() => Requests.Password"/>
+         </div>
+         <button type="submit">Login</button>         
+
+     </EditForm>       
+
+ @if (Errors is not null)
+{
+    <div class="blazor-error-boundary">@Errors</div>
+}
+
+
+@code{
+    [SupplyParameterFromForm(FormName = "LoginForm")]
+    public LoginRequests Requests { get; set; } = new LoginRequests();
+    private string? Errors = null!;
+
+    private async Task LoginAsync(EditContext arg)
+    {
+        try
+        {
+            var result = new  LoginResponse(null , null , false );
+
+            if (result.HasError)
+                Errors = result.Error;
+
+            NavigationManager.NavigateTo("/");
+        }
+        catch(Exception e)
+        {
+            Errors = e.ToString();
+        }
+        return;
+
+    }                       
+
+}

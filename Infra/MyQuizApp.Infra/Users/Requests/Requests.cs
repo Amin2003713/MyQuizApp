@@ -1,6 +1,6 @@
-﻿namespace MyQuizApp.Infra.Users;
+﻿using System.ComponentModel.DataAnnotations;
 
-using System.ComponentModel.DataAnnotations;
+namespace MyQuizApp.Infra.Users.Requests;
 
 public class LoginRequests
 {

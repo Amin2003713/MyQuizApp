@@ -1,4 +1,5 @@
-﻿using MyQuizApp.Infra.Users.Response;
+﻿using MyQuizApp.Infra.Users.Requests;
+using MyQuizApp.Infra.Users.Response;
 using MyQuizApp.Infra.Users.Routs;
 using Refit;
 

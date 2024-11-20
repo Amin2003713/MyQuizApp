@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyQuizApp.Domain.Users;
+namespace MyQuizApp.Domain.Categories;
 
 public class Category
 {

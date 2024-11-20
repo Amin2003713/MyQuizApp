@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyQuizApp.Domain.Users;
+namespace MyQuizApp.Domain.Quizzes;
 
 public class Question
 {

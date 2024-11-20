@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace MyQuizApp.Shared.Utiles.Atterbutes;
+namespace MyQuizApp.Domain.Utils.Atterbutes;
 
 public class DateGreaterThanAttribute(string comparisonProperty) : ValidationAttribute
 {

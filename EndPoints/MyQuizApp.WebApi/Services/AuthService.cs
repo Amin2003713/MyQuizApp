@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MyQuizApp.Domain.Users;
 using MyQuizApp.Infra.Users;
+using MyQuizApp.Infra.Users.Requests;
 using MyQuizApp.Infra.Users.Response;
 using MyQuizApp.WebApi.Data;
 

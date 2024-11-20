@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MyQuizApp.Shared.Utiles.Atterbutes;
+using MyQuizApp.Domain.Quizzes;
+using MyQuizApp.Domain.Utils.Atterbutes;
 
 namespace MyQuizApp.Domain.Users;
 
