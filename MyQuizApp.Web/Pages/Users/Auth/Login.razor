@@ -1,0 +1,34 @@
+﻿@page "/Login"
+@using MyQuizApp.Shared.Components.Layout
+@using MyQuizApp.Shared.Components.Users.Auth
+
+
+
+@layout AuthLayout
+
+<LoginComponent Callback="Callback" Errors="@Errors"/>
+
+
+
+
+
+
+
+
+
+@code {
+
+    public string Errors { get; set; } = null;
+
+    private async Task Callback(LoginRequests requests)
+    {
+        var result = await AuthState.LoginAsync(requests);
+
+        if (result.HasError)
+            Errors = result.Error ?? "";
+
+        NavigationManager.NavigateTo("/");
+        
+    }
+
+}

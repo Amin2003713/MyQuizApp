@@ -9,8 +9,9 @@
 @using Microsoft.JSInterop
 @using MyQuizApp.Web
 @using MyQuizApp.Web.Layout
+@using MyQuizApp.Web.Services
+@using MyQuizApp.Infra.Users.Requests
 
 
-
-
-@inject AuthenticationStateProvider AuthState
+@inject   NavigationManager NavigationManager
+@inject ClientStateProvider AuthState

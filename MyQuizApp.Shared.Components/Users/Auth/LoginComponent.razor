@@ -1,12 +1,4 @@
-﻿@page "/Login"
-@using Microsoft.AspNetCore.Components.Forms
-@using MyQuizApp.Infra.Users
-@using MyQuizApp.Infra.Users.Requests
-@using MyQuizApp.Infra.Users.Response
-@using MyQuizApp.Shared.Components.Layout
-@layout AuthLayout
-
-<h1>Login</h1>
+﻿<h1>Login</h1>
     
      <EditForm Model="Requests" Enhance="true" OnValidSubmit="LoginAsync" FormName="LoginForm">
          <DataAnnotationsValidator/>
@@ -33,26 +25,18 @@
 
 @code{
     [SupplyParameterFromForm(FormName = "LoginForm")]
-    public LoginRequests Requests { get; set; } = new LoginRequests();
-    private string? Errors = null!;
+    private LoginRequests Requests { get; set; } = new LoginRequests();
+    [Parameter]public string? Errors { get; set; } = null!;
+
+    [Parameter] public EventCallback<LoginRequests> Callback { get; set; }
+
 
     private async Task LoginAsync(EditContext arg)
     {
-        try
-        {
-            var result = new  LoginResponse(null , null , false );
-
-            if (result.HasError)
-                Errors = result.Error;
-
-            NavigationManager.NavigateTo("/");
-        }
-        catch(Exception e)
-        {
-            Errors = e.ToString();
-        }
-        return;
-
-    }                       
+        if (Requests is not null)
+            await Callback.InvokeAsync(Requests);
+        else
+            Errors = "Fill pls ";
+    }
 
 }

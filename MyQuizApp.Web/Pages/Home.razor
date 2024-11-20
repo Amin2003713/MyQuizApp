@@ -5,3 +5,12 @@
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<AuthorizeView>
+    <Authorized>
+        hello @AuthState.LoggedUser?.Email
+    </Authorized>                         
+    <NotAuthorized>
+        Go login urself pls 
+    </NotAuthorized>
+</AuthorizeView>

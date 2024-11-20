@@ -29,8 +29,7 @@ public LoggedUser? LoggedUser { get; private set; }
     }
 
 
-    public override  Task<AuthenticationState> GetAuthenticationStateAsync()
-        => _authenticationStateTask;
+    public override  Task<AuthenticationState> GetAuthenticationStateAsync() => _authenticationStateTask;
 
 
     public  async Task<LoginResponse> LoginAsync(LoginRequests requests)
@@ -62,15 +61,21 @@ public LoggedUser? LoggedUser { get; private set; }
         NotifyAuthenticationStateChanged(_authenticationStateTask);
     }
 
-    private async Task SetAuthenticatedUser()
+    public async Task SetAuthenticatedUser()
     {
         var user =await storageService.GetItemAsync<LoggedUser>(UserConst.UserInfo);
 
         if (user == null)
             RemoveAuthenticatedUser();
         else
+        {
+            LoggedUser = user;
+
             SetAuthenticatedUser(user);
+        }
+
     }
+
 
     private void SetAuthenticatedUser(LoggedUser user) => _authenticationStateTask = Task.FromResult(new AuthenticationState(
         new ClaimsPrincipal(new ClaimsIdentity(
