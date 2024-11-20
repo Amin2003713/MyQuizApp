@@ -1,74 +1,112 @@
 ﻿@using MyQuizApp.Domain.Users
+@using Bit.BlazorUI
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">MyQuizApp.Web</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+            <span class="navbar-toggler-icon">close</span>
         </button>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
+<div class="@NavMenuCssClass nav-scrollable">
+    <BitNav TItem="BitNavOption" Mode="BitNavMode.Automatic" IconOnly="IconOnly">
 
-        <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+        <!-- Home Menu -->
+        <BitNavOption Text="Home" IconName="@BitIconName.Home">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <BitText Typography="BitTypography.Body1">🏠 Home</BitText>
+            </NavLink>
+        </BitNavOption>
+
+        <!-- Admin Section -->
+        <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
+            <Authorized Context="_">
+                <!-- Quiz Section -->
+                <BitNavOption Text="Quiz" IconName="@BitIconName.TestPlan">
+                    <NavLink class="nav-link" href="/Admin/Quiz/ManageQuizzes">
+                        <BitText Typography="BitTypography.Body1">Manage Quizzes</BitText>
                     </NavLink>
-                </div>
-                <AuthorizeView  Roles="@(UserRoles.Admin.ToString())" >
-                    <Authorized Context="_">
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Admin/Quiz/ManageQuizzes">
-                                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Manage Quizzes
-                            </NavLink>
-                        </div>
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Admin/Quiz/AddQuizzes">
-                                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Add Quiz
-                            </NavLink>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
+                    <NavLink class="nav-link" href="/Admin/Quiz/AddQuizzes">
+                        <BitText Typography="BitTypography.Body1">Add Quiz</BitText>
+                    </NavLink>
+                </BitNavOption>
 
-                <AuthorizeView Roles="@(UserRoles.Student.ToString())">
-                    <Authorized Context="_">
-
-                    <div class="nav-item px-3">
-                        <NavLink class="nav-link" href="/Student/Quiz/MyQuizzes">
-                            <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> My Quizzes
-                        </NavLink>
-                    </div>
-
-                    </Authorized>
-                </AuthorizeView>
-
-
-                <div class="nav-item px-3">
-                    <a role="button" class="nav-link" @onclick="@(async () =>
-                                                                {
-                                                                    await AuthState.LogoutAsync();
-                                                                    NavigationManager.NavigateTo("/login", replace: true);
-                                                                })">
-                        <span aria-hidden="true"></span> logout
-                    </a>
-                </div>
+                <!-- Category Section -->
+                <BitNavOption Text="Categories" IconName="@BitIconName.BuildQueue">
+                    <NavLink class="nav-link" href="#" >
+                        <BitText Typography="BitTypography.Body1">Get All Categories</BitText>
+                    </NavLink>
+                    <NavLink class="nav-link" href="#">
+                        <BitText Typography="BitTypography.Body1">Get Category By ID</BitText>
+                    </NavLink>
+                    <NavLink class="nav-link" href="#">
+                        <BitText Typography="BitTypography.Body1">Create Category</BitText>
+                    </NavLink>
+                    <NavLink class="nav-link" href="#">
+                        <BitText Typography="BitTypography.Body1">Update Category</BitText>
+                    </NavLink>
+                    <NavLink class="nav-link" href="#">
+                        <BitText Typography="BitTypography.Body1">Delete Category</BitText>
+                    </NavLink>
+                </BitNavOption>
 
             </Authorized>
         </AuthorizeView>
-    </nav>
+
+        <!-- Student Section -->
+        <AuthorizeView Roles="@(UserRoles.Student.ToString())">
+            <Authorized Context="_">
+                <BitNavOption Text="Student" IconName="@BitIconName.ChildOf">
+                    <NavLink class="nav-link" href="/Student/Quiz/MyQuizzes">
+                        <BitText Typography="BitTypography.Body1">My Quizzes</BitText>
+                    </NavLink>
+                </BitNavOption>
+            </Authorized>
+        </AuthorizeView>
+
+        <!-- Logout Button -->
+        <BitNavOption Text="Logout" IconName="@BitIconName.SignOut">
+            <NavLink class="nav-link" @onclick="@(async () =>
+                                                {
+                                                    await AuthState.LogoutAsync();
+                                                    NavigationManager.NavigateTo("/login", replace: true);
+                                                })">
+                <BitText Typography="BitTypography.Body1">Logout</BitText>
+            </NavLink>
+        </BitNavOption>
+
+    </BitNav>
 </div>
 
 @code {
-    private bool collapseNavMenu = true;
+    public bool AdminSection = false;
+    private bool _studentSection = false;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private void ToggleSection(string sectionName)
+    {
+        if (sectionName == nameof(AdminSection))
+        {
+            AdminSection = !AdminSection;
+        }
+        else if (sectionName == nameof(_studentSection))
+        {
+            _studentSection = !_studentSection;
+        }
+    }
+
+    private bool _collapseNavMenu = true;
+
+    private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
+    public bool IconOnly { get; set; }
 
     private void ToggleNavMenu()
     {
-        collapseNavMenu = !collapseNavMenu;
+        IconOnly = !IconOnly;
+        _collapseNavMenu = !_collapseNavMenu;
     }
 
+
 }
+
+

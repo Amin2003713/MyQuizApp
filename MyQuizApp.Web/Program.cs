@@ -1,3 +1,4 @@
+using Bit.BlazorUI;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -10,6 +11,7 @@ builder.RootComponents.Add<MyQuizApp.Web.App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBlazoredLocalStorageAsSingleton();
+builder.Services.AddBitBlazorUIServices();
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();

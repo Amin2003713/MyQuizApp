@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyQuizApp.Infra.Categories;
 using MyQuizApp.Infra.Users;
@@ -13,23 +14,5 @@ public interface IFormFactor
 
 
 
-public static class Extentions
-{
-    public static void AddRefitConfig(this IServiceCollection services)
-    {
-        services.AddRefitClient<IUserApiClient>().ConfigureHttpClient(client =>
-        { 
-            client.Timeout = TimeSpan.FromSeconds(120);
-            client.BaseAddress = new Uri("https://localhost:7296");
-        });
 
-
-        services.AddRefitClient<ICategoryApi>().
-            ConfigureHttpClient(client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(120);
-                client.BaseAddress = new Uri("https://localhost:7296");
-            });
-    }
-}
 

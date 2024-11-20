@@ -42,7 +42,7 @@ public static class Endpoints {
             });
 
             // Create a new category
-            group.MapPost("/", async (CreateCategoryDto createDto, CategoryService service) =>
+            group.MapPost("/", async ([FromBody] CreateCategoryDto createDto, CategoryService service) =>
             {
                 var response = await service.CreateCategoryAsync(createDto);
                 return response.IsSuccess
@@ -52,7 +52,7 @@ public static class Endpoints {
             RequireAuthorization(r => r.RequireRole(nameof(UserRoles.Admin)));
 
             // Update an existing category
-            group.MapPut("/{id:guid}", async (Guid id, UpdateCategoryDto updateDto, CategoryService service) =>
+            group.MapPut("/{id:guid}", async (Guid id,[FromBody] UpdateCategoryDto updateDto, CategoryService service) =>
             {
                 var response = await service.UpdateCategoryAsync(id, updateDto);
                 return response.IsSuccess ? Results.Ok(response) : Results.NotFound(response);
