@@ -1,3 +1,3 @@
-﻿namespace MyQuizApp.WebApi.Services;
+﻿namespace MyQuizApp.Infra.Categories;
 
 public record CategoryDto(Guid Id, string Name);

@@ -23,6 +23,8 @@ public static class Extentions
 {
     public static void AddRefitConfig(this IServiceCollection services)
     {
+       
+
         services.AddRefitClient<IUserApiClient>().
             ConfigureHttpClient(client =>
             {
@@ -31,7 +33,7 @@ public static class Extentions
             });
 
 
-        services.AddRefitClient<ICategoryApi>().
+        services.AddRefitClient<ICategoryApi>(CreateRefitSettings).
             ConfigureHttpClient(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(120);
@@ -39,7 +41,7 @@ public static class Extentions
             });
     }
 
-    private static RefitSettings CreateRefitSettings(this IServiceProvider provider)
+    private static RefitSettings CreateRefitSettings(IServiceProvider provider)
     {
         var token = provider.GetRequiredService<ClientStateProvider>();
 

@@ -1,6 +1,7 @@
 ﻿using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore;
 using MyQuizApp.Domain.Categories;
+using MyQuizApp.Infra.Categories;
 using MyQuizApp.Infra.Services;
 using MyQuizApp.WebApi.Data;
 using Refit;

@@ -1,0 +1,73 @@
+﻿@page "/Admins/Categories/ManageCategories"
+@using MyQuizApp.Infra.Categories
+@using Bit.BlazorUI
+@using Blazorise.DataGrid
+@inject  ICategoryApi CategoryApi
+<h3>ManageCategories</h3>
+
+
+<div>@Errors</div>
+
+
+
+<DataGrid TItem="CategoryDto" Data="@Categories" AutoGenerateColumns="false" Responsive="true" Editable="true"
+          RowEditCancelled="OnRowEditCancelled" RowRemoved="OnRowRemoved" >
+
+    <DataGridColumns>
+        <!-- ID Column -->
+        <DataGridColumn TItem="CategoryDto" Field="@nameof(CategoryDto.Id)" Caption="ID" Readonly="true"/>
+
+        <!-- Name Column -->
+        <DataGridColumn TItem="CategoryDto" Field="@nameof(CategoryDto.Name)" Caption="Name" Editable="true"/>
+
+        <!-- Actions Column -->
+        <DataGridCommandColumn TItem="CategoryDto" Caption="Actions" Width="150px"/>
+    </DataGridColumns>
+</DataGrid>
+
+<!-- Add Category Button -->
+<Button Color="Primary" Clicked="AddCategory">Add New Category</Button>
+
+
+
+
+@code {
+    private List<CategoryDto>? Categories { get; set; } = [];
+    private string Errors { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine(Guid.CreateVersion7());
+
+        var result =await CategoryApi.GetAllCategoriesAsync();
+        if (result.IsSuccess)
+            Categories = result.Data.ToList();
+        else
+            Errors = result.Error;
+
+    }
+
+    private void AddCategory()
+    {
+        // Add a new empty category to enable inline editing
+        Categories.Add(new CategoryDto(Guid.NewGuid(), "New Category"));
+    }
+
+    private void OnRowEditCancelled(CategoryDto item)
+    {
+        Console.WriteLine($"Edit cancelled for: {item.Name}");
+    }
+
+    private void OnRowUpdated(CategoryDto item)
+    {
+        Console.WriteLine($"Updated: {item.Id} - {item.Name}");
+    }
+
+    private void OnRowRemoved(CategoryDto item)
+    {
+        Categories.Remove(item);
+        Console.WriteLine($"Deleted: {item.Id}");
+    }
+
+
+}

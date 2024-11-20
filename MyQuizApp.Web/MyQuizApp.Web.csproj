@@ -20,6 +20,12 @@
       <ProjectReference Include="..\MyQuizApp.Shared.Components\MyQuizApp.Shared.Components.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Blazorise.Bootstrap">
+        <HintPath>C:\Users\amin1\.nuget\packages\blazorise.bootstrap\1.7.0\lib\net9.0\Blazorise.Bootstrap.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 
 
 </Project>

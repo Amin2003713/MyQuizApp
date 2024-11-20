@@ -12,6 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Bit.BlazorUI" Version="9.0.1" />
+        <PackageReference Include="Bit.BlazorUI.Extras" Version="9.0.1" />
+        <PackageReference Include="Bit.BlazorUI.Icons" Version="9.0.1" />
+        <PackageReference Include="Blazorise.Bootstrap" Version="1.7.0" />
+        <PackageReference Include="Blazorise.DataGrid" Version="1.7.0" />
+        <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0"/>
     </ItemGroup>
 
