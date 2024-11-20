@@ -18,8 +18,9 @@ private Task<AuthenticationState> _authenticationStateTask  = Task.FromResult(ne
 
 
 public LoggedUser? LoggedUser { get; private set; }
-public bool IsLoggedIn => LoggedUser != null || this.LoggedUser?.Id != Guid.Empty;
+public bool IsLoggedIn => LoggedUser != null;
 public bool IsInitialized = false;
+private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
 
     public async Task<ClaimsPrincipal> GetAuthenticationStateProviderUserAsync()
@@ -64,16 +65,27 @@ public bool IsInitialized = false;
 
     public async Task SetAuthenticatedUser()
     {
-        var user =await storageService.GetItemAsync<LoggedUser>(UserConst.UserInfo);
-
-        if (user == null)
-            RemoveAuthenticatedUser();
-        else
+        await Semaphore.WaitAsync(); 
+        try
         {
-            LoggedUser = user;
-            SetAuthenticatedUser(user);
+            var user = await storageService.GetItemAsync<LoggedUser>(UserConst.UserInfo);
+
+            if (user == null)
+            {
+                RemoveAuthenticatedUser();
+            }
+            else
+            {
+                LoggedUser = user;
+                SetAuthenticatedUser(user);
+            }
         }
-        IsInitialized = true;
+        finally
+        {
+            IsInitialized = true;
+            NotifyAuthenticationStateChanged(_authenticationStateTask);
+            Semaphore.Release(); // Release the lock
+        }
     }
 
 
@@ -84,4 +96,6 @@ public bool IsInitialized = false;
 
     private void RemoveAuthenticatedUser() => _authenticationStateTask =
         Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+
+
 }

@@ -75,6 +75,7 @@ app.MapControllers();
 
 
 app.MapAuthApis();
+app.MapCategoryEndpoints();
 
 app.Run();
 

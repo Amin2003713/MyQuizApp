@@ -23,4 +23,9 @@
       <AdditionalFiles Include="Layout\AuthLayout.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Quiz\Students\MyQuizzes.razor" />
+      <UpToDateCheckInput Remove="Quiz\Students\_Imports.razor" />
+    </ItemGroup>
+
 </Project>
