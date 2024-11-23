@@ -26,19 +26,11 @@ public static class Extentions
        
 
         services.AddRefitClient<IUserApiClient>().
-            ConfigureHttpClient(client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(120);
-                client.BaseAddress = new Uri("https://localhost:7296");
-            });
+            ConfigureHttpClient(ConfigureHttpClient);
 
 
         services.AddRefitClient<ICategoryApi>(CreateRefitSettings).
-            ConfigureHttpClient(client =>
-            {
-                client.Timeout = TimeSpan.FromSeconds(120);
-                client.BaseAddress = new Uri("https://localhost:7296");
-            });
+            ConfigureHttpClient(ConfigureHttpClient);
     }
 
     private static RefitSettings CreateRefitSettings(IServiceProvider provider)
@@ -49,6 +41,12 @@ public static class Extentions
         {
             AuthorizationHeaderValueGetter = (_, _) => Task.FromResult(token.LoggedUser?.Token ?? "")
         };
+    }
+
+    private static void ConfigureHttpClient(HttpClient client)
+    {
+        client.Timeout = TimeSpan.FromSeconds(120);
+        client.BaseAddress = new Uri("http://localhost:5193");
     }
 
 }
