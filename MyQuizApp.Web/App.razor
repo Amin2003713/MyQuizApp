@@ -1,18 +1,24 @@
-﻿<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(MyQuizApp.Shared.Components._Imports).Assembly }" >
-    <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
-    </Found>
-    <NotFound>
-        <PageTitle>Not found</PageTitle>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p role="alert">Sorry, there's nothing at this address.</p>
-        </LayoutView>
-    </NotFound>
-</Router>   
+﻿@using Blazored.Modal
 
+
+<CascadingBlazoredModal>
+    <Router AppAssembly="@typeof(App).Assembly"
+            AdditionalAssemblies="new[] { typeof(MyQuizApp.Shared.Components._Imports).Assembly }">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)"/>
+            <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
+        </Found>
+        <NotFound>
+            <PageTitle>Not found</PageTitle>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingBlazoredModal>
 
 @code
+
 {
     protected override async Task OnInitializedAsync()
     {

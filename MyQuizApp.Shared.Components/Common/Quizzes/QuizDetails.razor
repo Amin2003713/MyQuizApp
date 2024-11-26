@@ -1,0 +1,57 @@
+@page "/quizzes/details/{id:guid}"
+@using MyQuizApp.Domain.Quizzes
+@using MyQuizApp.Infra.Quiezzes
+@inject IQuizApi QuizApi
+
+
+@if (IsLoading)
+{
+    <p>Loading quiz details...</p>
+}
+else if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p class="text-danger">@ErrorMessage</p>
+}
+else if (QuizInfo != null)
+{
+    <h2>@QuizInfo.Name</h2>
+    <p><strong>Category:</strong> @QuizInfo.Category?.Name</p>
+    <p><strong>Question Count:</strong> @QuizInfo.QuestionCount</p>
+    <p><strong>Duration:</strong> @QuizInfo.Duration</p>
+    <p><strong>Created On:</strong> @QuizInfo.CreatedOn</p>
+    <button class="btn btn-secondary" @onclick="@(() => NavigationManager.NavigateTo("/Admins/Quiz/ManageQuizzes"))">Back to List</button>
+}
+
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+    private Quiz? QuizInfo { get; set; }
+    private bool IsLoading { get; set; } = true;
+    private string? ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await QuizApi.GetQuizByIdAsync(Id);
+            if (response.IsSuccess)
+            {
+                QuizInfo = response.Data;
+            }
+            else
+            {
+                ErrorMessage = response.Error;
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+}
+

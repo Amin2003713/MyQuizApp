@@ -1,5 +1,6 @@
 using Bit.BlazorUI;
 using Blazored.LocalStorage;
+using Blazored.Modal;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
@@ -14,6 +15,7 @@ builder.RootComponents.Add<MyQuizApp.Web.App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBlazoredLocalStorageAsSingleton();
+builder.Services.AddBlazoredModal();
 builder.Services.AddBitBlazorUIServices();
 
 builder.Services.AddCascadingAuthenticationState();

@@ -1,39 +1,49 @@
 ﻿@page "/Admins/Categories/ManageCategories"
-@using MyQuizApp.Infra.Categories
-@using Blazorise.DataGrid
-@inject  ICategoryApi CategoryApi 
 
+@using Blazorise
+@using Bit.BlazorUI
+@using MyQuizApp.Infra.Categories
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using MyQuizApp.Domain.Categories
+@using MyQuizApp.Shared.Components.Admins.Categories.Common.Modal
+@using MyQuizApp.WebApi.Services
+@using MyQuizApp.Shared.Components.Common.Modal
 <h3>ManageCategories</h3>
 
 
 <div>@Errors</div>
 
 
+<QuickGrid Items="Categories" Virtualize >
+    <PropertyColumn Property="@(p => p.Id)" Sortable="true"/>
+    <PropertyColumn Property="@(p => p.Name)"  Sortable="true"/>
+        <TemplateColumn Context="item" Title="Actions">
+            <button @onclick="() => Edit(item.Id)">Edit</button>
+            <button @onclick="() => Delete(item.Id)">Delete</button>
+        </TemplateColumn>
+</QuickGrid>
 
-<DataGrid TItem="CategoryDto" Data="@Categories" AutoGenerateColumns="false" Responsive="true" Editable="true"
-          RowEditCancelled="OnRowEditCancelled" RowRemoved="OnRowRemoved" >
+<!-- Add Category Button -->             
+<hr>
+<Button Color="Color.Primary" @onclick="AddCategory">Add New Category</Button>   
 
-    <DataGridColumns>
-        <!-- ID Column -->
-        <DataGridColumn TItem="CategoryDto" Field="@nameof(CategoryDto.Id)" Caption="ID" Readonly="true"/>
-
-        <!-- Name Column -->
-        <DataGridColumn TItem="CategoryDto" Field="@nameof(CategoryDto.Name)" Caption="Name" Editable="true"/>
-
-        <!-- Actions Column -->
-        <DataGridCommandColumn TItem="CategoryDto" Caption="Actions" Width="150px"/>
-    </DataGridColumns>
-</DataGrid>
-
-<!-- Add Category Button -->
-<Button Color="Primary" Clicked="AddCategory">Add New Category</Button>
+<hr>
 
 
-
+<AddCategory Title="Edit Category" IsVisible="IsVisibleAdd" OnConfirmOrCancel="CallbackAdd" CategoryName=""/>
+<AddCategory Title="Edit Category" IsVisible="IsVisibleEdit" OnConfirmOrCancel="CallbackEdit" CategoryName="@CategoryName" Id="EditId"/>
+<Conferm LoadModel="OnInitializedAsync" @ref="DeleteModal" IsVisible="IsVisibleDelete" />
+    
 
 @code {
-    private List<CategoryDto>? Categories { get; set; } = [];
+    private IQueryable<CategoryDto>? Categories { get; set; } 
     private string Errors { get; set; }
+    private string CategoryName { get; set; }
+    private bool IsVisibleAdd { get; set; } = false;
+    private bool IsVisibleEdit { get; set; } = false;
+    private bool IsVisibleDelete { get; set; } = false;
+    public Guid? EditId { get; set; }
+    public Conferm? DeleteModal { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -41,33 +51,62 @@
 
         var result =await CategoryApi.GetAllCategoriesAsync();
         if (result.IsSuccess)
-            Categories = result.Data.ToList();
+            Categories = result.Data.AsQueryable();
         else
             Errors = result.Error;
+    }
 
+
+    private void Edit(Guid id)
+    {
+        IsVisibleEdit = !IsVisibleEdit;
+        CategoryName = Categories!.FirstOrDefault(a=>a.Id == id)!.Name;
+        EditId = id;
+    }
+
+    private void Delete(Guid id)
+    {
+        DeleteModal!.Category = Categories!.FirstOrDefault(a => a.Id == id)!;
+        IsVisibleDelete = !IsVisibleDelete;
     }
 
     private void AddCategory()
     {
-        // Add a new empty category to enable inline editing
-        Categories.Add(new CategoryDto(Guid.NewGuid(), "New Category"));
+        IsVisibleAdd = !IsVisibleAdd;
     }
 
-    private void OnRowEditCancelled(CategoryDto item)
+    private async Task CallbackAdd((bool toggle, string name, Guid? Id) obj)
     {
-        Console.WriteLine($"Edit cancelled for: {item.Name}");
-    }
+        if (obj.toggle)
+        {
+            var category = new CreateCategoryDto(obj.name);
 
-    private void OnRowUpdated(CategoryDto item)
+            var result =await CategoryApi.CreateCategoryAsync(category);
+
+            if(!result.IsSuccess)
+                return;
+
+            await OnInitializedAsync();
+            StateHasChanged();
+        }
+
+        IsVisibleAdd = !IsVisibleAdd;
+    }
+    private async Task CallbackEdit((bool toggle, string name, Guid? Id) obj)
     {
-        Console.WriteLine($"Updated: {item.Id} - {item.Name}");
-    }
+        if (obj.toggle && obj.Id != Guid.Empty)
+        {
+            var updateDto = new UpdateCategoryDto(obj.name);
+            var result =await CategoryApi.UpdateCategoryAsync( obj.Id.Value , updateDto);
 
-    private void OnRowRemoved(CategoryDto item)
-    {
-        Categories.Remove(item);
-        Console.WriteLine($"Deleted: {item.Id}");
-    }
+            if(!result.IsSuccess)
+                return;
 
+            await OnInitializedAsync();
+            StateHasChanged();
+        }
+
+        IsVisibleEdit = !IsVisibleEdit;
+    }
 
 }

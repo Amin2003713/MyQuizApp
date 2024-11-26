@@ -1,0 +1,61 @@
+@using Bit.BlazorUI
+@using MyQuizApp.Infra.Categories
+<BitModal @bind-IsOpen="IsVisible" AutoToggleScroll="false" Position="BitModalPosition.Center" Modeless>
+<div class=" m-2">
+    <div id="modal-header">
+        <h3><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Confirm Delete</h3>
+        <span data-confirm="0" class="modal-action" id="modal-close">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </span>
+    </div>
+    <div id="modal-content">
+        @if (Category != null)
+           {
+               <p>
+                   Are you sure you wanna delete the @Category.Name from the list ?
+               </p>
+           }
+        else
+        {
+            <p>@Massage</p>
+        }
+    </div>
+    <div id="modal-buttons">
+        <button class="modal-action btn btn-primary" @onclick="CloseModal">No</button>
+        <button class="modal-action btn btn-danger" @onclick="SubmitCategory">Yes</button>
+    </div>
+</div>
+</BitModal>
+
+
+
+@code {
+
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public CategoryDto Category { get; set; }
+[Parameter] public EventCallback LoadModel { get; set; }
+    private string Massage;
+    private void CloseModal()
+        => IsVisible = !IsVisible;
+
+    private async Task SubmitCategory()
+    {
+        if (Category is null)
+        {
+            CloseModal();
+            return;
+        }
+
+        var result = await CategoryApi.DeleteCategoryAsync(Category.Id);
+        if (result.IsSuccess)
+        {
+            await LoadModel.InvokeAsync();
+            CloseModal();
+            return;
+        }
+
+        Massage = result.Error;
+    }
+
+
+}

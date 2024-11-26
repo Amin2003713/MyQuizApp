@@ -1,0 +1,43 @@
+@using Bit.BlazorUI
+@using Blazorise.Extensions
+
+<BitModal @bind-IsOpen="IsVisible" AutoToggleScroll="false"  Position="BitModalPosition.Center" Modeless  >
+    <div class="modal-header m-2" >
+        <span class="modal-header-text">@Title</span>
+        <BitButton Variant="BitVariant.Text" OnClick="@(() => IsVisible = false)" IconName="@BitIconName.ChromeClose"
+                   Title="Close"/>
+    </div>
+    <div class="modal-body m-2">
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="categoryName">Category Name:</label>
+                <input type="text" id="categoryName" class="form-control" @bind="CategoryName"
+                       placeholder="Enter category name"/>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer m-2">
+        <div>
+            <button class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
+            <button class="btn btn-primary" @onclick="SubmitCategory">@(Id == Guid.Empty ? "Submit" : "Update")</button>
+        </div>
+    </div>
+</BitModal>
+    
+
+    @code {
+
+    [Parameter] public EventCallback<(bool toggle , string name , Guid? Id)> OnConfirmOrCancel { get; set; }
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string? CategoryName { get; set; }
+    [Parameter] public Guid? Id { get; set; }
+
+    private async Task CloseModal() 
+        => await OnConfirmOrCancel.InvokeAsync((false, null , null)!);
+
+    private async Task SubmitCategory()
+        => await OnConfirmOrCancel.InvokeAsync((true, CategoryName , Id)!);
+    
+
+}

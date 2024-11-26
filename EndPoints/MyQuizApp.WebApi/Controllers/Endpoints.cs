@@ -1,6 +1,7 @@
 using Azure.Core;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using MyQuizApp.Domain.Quizzes;
 using MyQuizApp.Domain.Users;
 using MyQuizApp.Infra.Users;
 using MyQuizApp.Infra.Users.Requests;
@@ -23,6 +24,46 @@ public static class Endpoints {
         return endpoints;
     }
 
+    public static void MapQuizzesEndpoints(this WebApplication app)
+    {
+
+        var group = app.MapGroup("/api/quizzes").RequireAuthorization();
+
+        group.MapPost("/", async (Quiz quiz, QuizService quizService) =>
+        {
+            var result = await quizService.CreateQuizAsync(quiz);
+            return result.IsSuccess
+                ? Results.Created($"/{result.Data.Id}", result.Data)
+                : Results.BadRequest(result);
+        });
+
+        group.MapGet("/{id:guid}", async (Guid id, QuizService quizService) =>
+        {
+            var result = await quizService.GetQuizByIdAsync(id);
+            return result.IsSuccess ? Results.Ok(result.Data) : Results.NotFound(result);
+        });
+
+        group.MapGet("/ListAll", async (QuizService quizService) =>
+        {
+            var result = await quizService.GetAllQuizzesAsync();
+            return result.IsSuccess ? Results.Ok(result.Data) : Results.BadRequest(result);
+        });
+
+        group.MapPut("/{id:guid}", async (Guid id, Quiz quiz, QuizService quizService) =>
+        {
+            if (id != quiz.Id)
+                return Results.BadRequest(ApiResponse.Failed("ID mismatch."));
+
+            var result = await quizService.UpdateQuizAsync(quiz);
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result);
+        });
+
+        group.MapDelete("/{id:guid}", async (Guid id, QuizService quizService) =>
+        {
+            var result = await quizService.DeleteQuizAsync(id);
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result);
+        });
+    }
         public static void MapCategoryEndpoints(this WebApplication app)
         {
             var group = app.MapGroup("/api/categories").RequireAuthorization();

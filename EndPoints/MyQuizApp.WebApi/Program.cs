@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<QuizService>();
 
 
 
@@ -77,6 +78,7 @@ app.MapControllers();
 
 app.MapAuthApis();
 app.MapCategoryEndpoints();
+app.MapQuizzesEndpoints();
 
 app.Run();
 
