@@ -11,10 +11,9 @@ public class Question
     [StringLength(500, ErrorMessage = "متن سوال نمی‌تواند بیش از ۵۰۰ کاراکتر باشد.")]
     public string Text { get; set; }
 
-    [Required(ErrorMessage = "شناسه آزمون نمی‌تواند خالی باشد.")]
     public Guid QuizId { get; set; }
 
     [ForeignKey(nameof(QuizId))] public Quiz Quiz { get; set; }
 
-    public ICollection<Option> Options { get; set; } = new List<Option>();
+    public ICollection<Option> Options { get; set; } = new List<Option>(4);
 }

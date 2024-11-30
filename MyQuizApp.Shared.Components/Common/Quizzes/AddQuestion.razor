@@ -1,0 +1,53 @@
+﻿@using MyQuizApp.Domain.Quizzes
+
+
+<EditForm Model="@Question" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+
+    <div>
+        <label for="questionText">متن سوال:</label>
+        <InputText id="questionText" @bind-Value="Question.Text" class="form-control"/>
+        <ValidationMessage For="@(() => Question.Text)"/>
+    </div>
+
+    <div class="mt-3">
+        <label for="options">گزینه‌ها:</label>
+        @foreach (var option in Question.Options)
+        {
+            <div class="mb-2">
+                <InputText @bind-Value="option.Text" class="form-control" placeholder="متن گزینه"/>
+                <InputCheckbox @bind-Value="option.IsCorrectAnswer" class="form-check-input"/>
+                <span>صحیح است</span>
+                <button type="button" class="btn btn-danger" @onclick="() => RemoveOption(option)">حذف</button>
+            </div>
+        }
+
+        <button type="button" class="btn btn-primary" @onclick="AddOption">اضافه کردن گزینه</button>
+    </div>
+
+    <div class="mt-3">
+        <button type="submit" class="btn btn-success">ذخیره سوال</button>
+    </div>
+</EditForm>
+
+@code {  
+    [Parameter] public EventCallback<Question> Callback { get; set; }
+    [Parameter] public Question? Question { get; set; } = new();
+
+    private void AddOption()
+    {
+        Question!.Options.Add(new Option());
+    }
+
+    private void RemoveOption(Option option)
+    {
+        Question.Options.Remove(option);
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await Callback.InvokeAsync(Question);
+    }
+
+}

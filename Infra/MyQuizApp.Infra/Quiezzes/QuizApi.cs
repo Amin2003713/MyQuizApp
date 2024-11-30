@@ -22,3 +22,9 @@ public interface IQuizApi
     [Delete("/api/quizzes/{id}")]
     Task<ApiResponse> DeleteQuizAsync(Guid id);
 }
+
+
+public static class QuizConst
+{
+    public static string QuestionsStepper { get; set; } = "Question";
+}

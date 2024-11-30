@@ -1,7 +1,145 @@
 ﻿@page "/Admins/Quiz/AddQuizzes"
+@using MyQuizApp.Domain.Quizzes
+@using MyQuizApp.Shared.Components.Common
+@using MyQuizApp.Shared.Components.Common.Quizzes
 
-<h3>AddQuiz</h3>
+
+<h3>Create a New Quiz</h3>
+
+<EditForm Model="@Quiz">
+    <DataAnnotationsValidator/>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="quizName">Quiz Name</label>
+                    <InputText id="quizName" class="form-control" @bind-Value="Quiz.Name"/>
+                    <ValidationMessage For="@(() => Quiz.Name)"/>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label for="questionCount">Questions Count</label>
+                    <InputNumber TValue="int" @bind-Value="@Quiz.QuestionCount" id="questionCount" Placeholder="Question Count"/>
+                    <ValidationMessage For="@(() => Quiz.QuestionCount)"/>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label for="createdOn">Created On</label>
+                    <InputDate id="createdOn" class="form-control" @bind-Value="Quiz.CreatedOn"/>
+                    <ValidationMessage For="@(() => Quiz.CreatedOn)"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="duration">Duration min</label>
+                    <InputNumber id="duration" class="form-control" @bind-Value="Duration"/>
+                    <ValidationMessage For="@(() => Duration)"/>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <select id="category" class="form-control" @bind="Quiz.CategoryId">
+                        @if (_categories!.Any())
+                        {
+                            @foreach (var category in _categories!)
+                            {
+                                <option value="@category.Id">@category.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            @(_ = OnInitializedAsync())
+                        }
+                    </select>
+                    <ValidationMessage For="@(() => Quiz.CategoryId)"/>
+                </div>
+            </div>
+
+            <div class="col">
+                <div class="form-group form-check m-1">
+                    <InputCheckbox id="isActive" class="form-check-input" @bind-Value="Quiz.IsActive"/>
+                    <label class="form-check-label" for="isActive">Is Active</label>
+                </div>
+            </div>
+        </div>
+
+        <hr/>
+    </div>
+
+    <button class="btn btn-primary" onclick="@(() => { ShowStepper = true; StateHasChanged();
+                                                   Quiz.QuestionsList();
+                                               })">Next Step</button>
+</EditForm>
+ 
+<div class="card">
+    @if (ShowStepper)
+    {
+              @for (var i = 0; i < Quiz.QuestionCount; i++)
+              {
+                  <AddQuestion
+                      Callback="HandleQuestion" 
+                      Question="@(Quiz.Questions.Count ==  Quiz.QuestionCount ? Quiz.Questions[i] : new Question())"
+                  />
+              }
+    }
+    else
+    {
+        <h5>waitting .... </h5>
+    }
+</div>
+
+<div>@Errors</div>
+
 
 @code {
-    
+    private IEnumerable<CategoryDto>? _categories { get; set; }
+    private Quiz Quiz { get; set; } = new();
+    private int Duration { get; set; } = new();
+    private string Errors { get; set; } = null!;
+    private int StepperIndex { get; set; } = 0;
+    private bool ShowStepper { get; set; } 
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await CategoryApi.GetAllCategoriesAsync();
+
+        if(!result.IsSuccess)
+            return;
+
+        _categories = (result).Data;
+    }
+
+  
+
+    private async Task Finished()
+    {
+        Quiz.Duration = TimeSpan.FromMinutes(Duration);
+
+        var result = await QuizApi.CreateQuizAsync(Quiz);
+
+        if (!result.IsSuccess)
+        {
+            Errors = result.Error;
+            return;
+        }
+
+        NavigationManager.NavigateTo("/Admins/Quiz/ManageQuizzes");
+    }
+
+    private void HandleQuestion(Question obj)
+    {
+        Quiz.Questions.Add(obj);
+        StepperIndex++;
+        StateHasChanged();
+    }
+
 }

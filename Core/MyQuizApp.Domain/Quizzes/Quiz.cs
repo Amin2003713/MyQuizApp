@@ -13,13 +13,13 @@ public class Quiz
     public string Name { get; set; }
 
     [Range(1, 1000, ErrorMessage = "تعداد سوالات باید بین ۱ و ۱۰۰۰ باشد.")]
-    public int QuestionCount { get; set; }
+    public int QuestionCount { get; set; } = 1;
 
     [Required(ErrorMessage = "تاریخ ایجاد نمی‌تواند خالی باشد.")]
-    public DateTime CreatedOn { get; set; }
+    public DateTime CreatedOn { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "مدت‌زمان آزمون نمی‌تواند خالی باشد.")]
-    public TimeSpan Duration { get; set; }
+    public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(20);
 
     public bool IsActive { get; set; }
 
@@ -28,5 +28,9 @@ public class Quiz
 
     [ForeignKey(nameof(CategoryId))] public virtual Category Category { get; set; }
 
-    public ICollection<Question> Questions { get; set; } = new List<Question>();
+    public List<Question> Questions { get; set; } = new List<Question>();
+
+
+
+    public List<Question> QuestionsList() => new(QuestionCount);
 }

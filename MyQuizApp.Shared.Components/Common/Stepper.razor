@@ -1,0 +1,57 @@
+﻿@using Blazorise 
+
+<Steps @ref="stepsRef" SelectedStep="@_currentId.ToString()" SelectedStepChanged="@OnSelectedStepChanged" VerticalAlignment="VerticalAlignment.Baseline">
+    <Items>
+       @for (var i = 1; i <= StepCount; i++)
+       {
+           <Step Name="@i.ToString()" Shadow="Shadow.Small"/>
+       }
+        <Step Name="@((StepCount + 1).ToString())">
+            finish and Submit.
+        </Step>
+    </Items>
+    <Content>
+        @for (var i = 1; i <= StepCount; i++)
+    {
+            <StepPanel Name="@i.ToString()" Shadow="Shadow.Small">
+                @StepperElement
+            </StepPanel>
+        }
+        <StepPanel Name="@_currentId.ToString()">
+            <Field>
+                <Button onclick="">
+                    Submit
+                </Button>
+            </Field>
+        </StepPanel>
+    </Content>
+</Steps>
+<Div Display="Display.Flex" Class="justify-content-center">
+    <Button Color="Color.Secondary" Margin="Margin.Is2.FromEnd" Clicked="() => stepsRef.PreviousStep()">
+        Previous
+    </Button>
+    <Button Color="Color.Primary" Clicked="() => stepsRef.NextStep()">
+        Next
+    </Button>
+</Div>
+@code{       
+
+  [Parameter] public int StepCount { get; set; }
+  [Parameter] public EventCallback Finished { get; set; }
+  [Parameter] public required RenderFragment StepperElement { get; set; }
+
+  [Parameter] public int _currentId { get; set; } = 1;
+  private Steps stepsRef;
+
+
+  public Task OnSelectedStepChanged(string name)
+  {
+      if(int.TryParse(name , out var result ))
+
+      _currentId = result;
+
+      return Task.CompletedTask;
+  }
+
+
+}

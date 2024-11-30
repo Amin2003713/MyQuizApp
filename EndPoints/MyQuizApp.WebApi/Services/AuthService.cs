@@ -63,7 +63,7 @@ public class AuthService(IPasswordHasher<User> passwordHasher, Context db)
             issuer: "MyQuizApp.WebApi",
              audience: "MyQuizApp.Client",
              claims: claims,
-            expires: DateTime.Now.AddMinutes(3600),
+            expires: DateTime.Now.AddYears(3600),
              signingCredentials: creds
          );
          return new JwtSecurityTokenHandler().WriteToken(jwtToken);

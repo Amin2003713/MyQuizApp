@@ -2,6 +2,7 @@
 @using MyQuizApp.Infra.Quiezzes
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using MyQuizApp.Domain.Quizzes
+@using Microsoft.AspNetCore.Components.Routing
 
 @inject IQuizApi QuizApi
 
@@ -32,7 +33,10 @@ else if (Quizzes != null && Quizzes.Any())
 else
 {
     <p>No quizzes available.</p>
-}
+} 
+<button>
+    <NavLink class="btn btn-primary" href="/Admins/Quiz/AddQuizzes">Add Quiz</NavLink>
+</button>
 
 @code {
     private IQueryable<Quiz> Quizzes { get; set; } =default!;
