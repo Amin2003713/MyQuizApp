@@ -7,6 +7,7 @@ using Blazorise.Icons.FontAwesome;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using MudBlazor.Services;
 using MyQuizApp.Infra.Services;
 using MyQuizApp.Web.Services;
 
@@ -16,8 +17,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddBlazoredLocalStorageAsSingleton();
 builder.Services.AddBlazoredModal();
-builder.Services.AddBitBlazorUIServices();
-
+builder.Services.AddMudServices();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<ClientStateProvider>();

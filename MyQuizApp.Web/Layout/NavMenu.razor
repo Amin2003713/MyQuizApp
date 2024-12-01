@@ -1,101 +1,43 @@
-﻿@using Bit.BlazorUI
+﻿@using MudBlazor
 @using MyQuizApp.Domain.Users
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MyQuizApp.Web</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable">
-    <nav class="nav flex-column">
-        <AuthorizeView>
-            <Authorized>
-                <!-- Home -->
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-                    </NavLink>
-                </div>
-                <!-- Admin Section -->
-                <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
-                    <Authorized Context="_">
-                        <!-- Quiz Section -->
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Admins/Quiz/ManageQuizzes">
-                                Manage Quizzes
-                            </NavLink>
-                        </div>
-
-                        
-
-                        <!-- Category Section -->
-                       
-
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Admins/Categories/ManageCategories">
-                                Manage Category
-                            </NavLink>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
-
-                <!-- Student Section -->
-                <AuthorizeView Roles="@(UserRoles.Student.ToString())">
-                    <Authorized Context="_">
-
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Student/Quiz/MyQuizzes">
-                                My Quizzes
-                            </NavLink>
-                        </div>
 
 
-                        <div class="nav-item px-3">
-                            <NavLink class="nav-link" href="/Student/Categories/ListCategories">
-                                Get All Categories
-                            </NavLink>
-                        </div> 
-                        
+<MudNavMenu>
+    <AuthorizeView>
+        <Authorized>
+            <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
+                <Authorized Context="_">
+                    <MudNavLink href="/Admins/Quiz/ManageQuizzes" Match="NavLinkMatch.Prefix">Manage Quizzes</MudNavLink>
+                    <MudNavLink href="/Admins/Categories/ManageCategories" Match="NavLinkMatch.Prefix">Manage Categories</MudNavLink>
 
-                    </Authorized>
-                </AuthorizeView>
+                </Authorized>
+            </AuthorizeView>
 
+            <AuthorizeView Roles="@(UserRoles.Student.ToString())">
+                <Authorized Context="_">
 
+                    <MudNavLink href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">My Quizzes</MudNavLink>
+                    <MudNavLink href="/Student/Categories/ListCategories" Match="NavLinkMatch.Prefix">Get All Categories</MudNavLink>
 
-                <!-- Logout -->
-                <div class="nav-item px-3">
-                    <a role="button" class="nav-link" @onclick="@(async () =>
-                                                                {
-                                                                    await AuthState.LogoutAsync();
-                                                                    NavigationManager.NavigateTo("/login", replace: true);
-                                                                })">
-                        <span aria-hidden="true"></span> Logout
-                    </a>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-    </nav>
-</div>
+                </Authorized>
+            </AuthorizeView>
+            
+        </Authorized>
+    </AuthorizeView>
 
-    
+    <MudNavGroup Title="Settings">
+        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+    </MudNavGroup>   
 
-@code{
+    <MudNavLink OnClick="@(async () =>
+                           {
+                               await AuthState.LogoutAsync();
+                               NavigationManager.NavigateTo("/login", replace: true);
+                           })" Match="NavLinkMatch.Prefix">Logout</MudNavLink>
 
-    private bool _collapseNavMenu = true;
-
-    private string? NavMenuCssClass => _collapseNavMenu ? "collapse" : null;
-    public bool IconOnly { get; set; }
-
-    private void ToggleNavMenu()
-    {
-        IconOnly = !IconOnly;
-        _collapseNavMenu = !_collapseNavMenu;
-    }
+</MudNavMenu>
 
 
-}
 
 

@@ -1,24 +1,58 @@
-﻿
+﻿@using MudBlazor
+
 @inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
+
+<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_isDarkMode"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout Class="page">
+    <MudAppBar>
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
+                       OnClick="@((e) => DrawerToggle())"/>
+        Quiz App 
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen">
+        <MudDrawerHeader LinkToIndex>
+            <MudText Typo="Typo.h5" Class="mt-1" >Quiz App</MudText>
+        </MudDrawerHeader>
         <NavMenu/>
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @if (AuthState.IsInitialized)
-            {
+    </MudDrawer>
+    <MudMainContent>
+        @if (AuthState.IsInitialized)
+        {
+            <article class="content px-4">
                 @Body
-            }
-            else
-            {
-              <div class="message"> Loading ....</div>
-            }
-        </article>
-    </main>
-</div>     
+            </article>
+            
+        }
+        else
+        {
+            <div class="message"> Loading ....</div>
+        }
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private bool _isDarkMode;
+
+    private MudThemeProvider _mudThemeProvider;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemPreference();
+            StateHasChanged();
+        }
+    }
+
+}
