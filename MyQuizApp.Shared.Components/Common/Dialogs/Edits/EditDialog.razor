@@ -1,0 +1,37 @@
+﻿@using MyQuizApp.Shared.Components.Common.Dialogs.Common
+@typeparam TType
+
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">@Title</MudText>
+        <MudDivider Class="my-2"/>
+        @Content
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Confirm">
+            Save
+        </MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="Cancel">
+            Cancel
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Edit Item";
+    [Parameter] public RenderFragment Content { get; set; }
+    [Parameter] public TType Modal { get; set; }
+
+    [CascadingParameter] MudDialogInstance DialogInstance { get; set; }
+
+    private void Confirm()
+    {
+        DialogInstance.Close(new ModalResult<TType>(Modal , true));
+    }
+
+    private void Cancel()
+    {
+        DialogInstance.Cancel();
+    }
+
+}

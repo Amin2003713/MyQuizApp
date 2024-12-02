@@ -1,0 +1,142 @@
+﻿@page "/Admin/Student/StudentList"
+
+<MudPaper Class="p-4" Elevation="4" >
+    <MudText Typo="Typo.h6">Users</MudText>
+
+    @if (Users == null)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="my-4"/>
+        <MudText Typo="Typo.body1">Loading users...</MudText>
+    }
+    else if (!Users.Any())
+    {
+        <MudText Typo="Typo.body1" Color="Color.Secondary">No users found.</MudText>
+    }
+    else
+    {
+        <MudPaper Class="p-4" Elevation="4">
+            <MudText Typo="Typo.h6">Manage Users</MudText>
+
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="4">
+                    <!-- Search Field -->
+                    <MudTextField Label="Search" @bind-Value="_searchQuery" Adornment="Adornment.Start"
+                                  Icon="@Icons.Material.Filled.Search"
+                                  Class="mt-2"/>
+                </MudItem>
+
+                <MudItem xs="12" sm="6" md="4">
+                    <!-- Active/Inactive Filter -->
+                    <MudSelect Label="Status" @bind-Value="_selectedStatus" Class="mt-2">
+                        <MudSelectItem Value="1">All</MudSelectItem>
+                        <MudSelectItem Value="2">Active</MudSelectItem>
+                        <MudSelectItem Value="3">Inactive</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+            </MudGrid>
+
+            <!-- Filtered Table -->
+            <MudTable Items="FilteredUsers" Dense Bordered Hover SortLabel="true" Class="mt-3" Virtualize>
+                <HeaderContent>
+                    <MudTh>
+                        <MudTableSortLabel T="User" SortBy="user => user.Name">Name</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="User" SortBy="user => user.Email">Email</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="User" SortBy="user => user.Phone">Phone</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="User" SortBy="user => user.UserRoles">Role</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>
+                        <MudTableSortLabel T="User" SortBy="user => user.IsActive">Status</MudTableSortLabel>
+                    </MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Name</MudTd>
+                    <MudTd>@context.Email</MudTd>
+                    <MudTd>@context.Phone</MudTd>
+                    <MudTd>@context.UserRoles</MudTd>
+                    <MudTd>@(context.IsActive ? "Active" : "Inactive")</MudTd>
+                    <MudTd>
+                        <MudButton Color="Color.Primary" Variant="Variant.Text" Size="Size.Small"
+                                   OnClick="@(() => ToggleUserStatus(context))">
+                            @(context.IsActive ? "Deactivate" : "Activate")
+                        </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
+</MudPaper>
+
+@code {
+    private List<User> Users;
+    private string _searchQuery = string.Empty;
+    private int _selectedStatus = 1; // Can be true, false or null (all)
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await UserApi.ListUsers();
+
+        if (response.IsSuccess)
+        {
+            Users = response.Data;
+            return;
+        }
+
+        Snackbar.Add(response.Error, Severity.Error);
+    }
+
+
+    private async Task ToggleUserStatus(User user)
+    {
+        user.IsActive = !user.IsActive; // Toggle the IsActive status
+
+        // Optionally call an API to update the user status (simulate here)
+        var result = await UserApi.StudentActivate(user.Id);
+
+        if (result.IsSuccess)
+        {
+            Snackbar.Add($"User has been {(user.IsActive ? "activated" : "deactivated")}", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to update user status", Severity.Error);
+        }
+
+        await OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private IEnumerable<User> FilteredUsers
+    {
+        get
+        {
+            var query = Users.AsEnumerable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(_searchQuery))
+            {
+                query = query.Where(
+                    user =>
+                        user.Name.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase)  ||
+                        user.Email.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase) ||
+                        user.Phone.Contains(_searchQuery, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Apply active status filter
+            if (_selectedStatus != 1)
+            {
+                query = query.Where(user => user.IsActive == _selectedStatus is 2);
+            }
+
+            return query;
+        }
+    }
+
+}

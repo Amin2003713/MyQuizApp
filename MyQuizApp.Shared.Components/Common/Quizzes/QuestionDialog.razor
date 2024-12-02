@@ -1,0 +1,38 @@
+﻿@using MyQuizApp.Domain.Quizzes
+<MudDialog>
+    <DialogContent>
+        <MudText Align="Align.Center">Quiz Questions</MudText>
+        <MudPaper Class="p-4">
+            @if (Quiz?.Questions != null)
+            {
+                @foreach (var question in Quiz.Questions)
+                {
+                    <MudText Typo="Typo.h6">@question.Text</MudText>
+                    <MudGrid>
+                        @foreach (var option in question.Options)
+                        {
+                            <MudItem xs="12" sm="6">
+                                <MudChip T="string" Color="option.IsCorrectAnswer ? Color.Success : Color.Default"
+                                         Variant="Variant.Filled">
+                                    @option.Text
+                                </MudChip>
+                            </MudItem>
+                        }
+                    </MudGrid>
+                }
+            }
+            else
+            {
+                <MudText Typo="Typo.body1" Color="Color.Secondary">No questions available.</MudText>
+            }
+        </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="@(() => DialogInstance.Close())" Color="Color.Primary">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance DialogInstance { get; set; }
+    [Parameter] public Quiz Quiz { get; set; }
+}

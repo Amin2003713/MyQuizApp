@@ -1,0 +1,45 @@
+﻿@page "/StudentRegister"
+@using MyQuizApp.Domain.Users
+
+
+<MudPaper Class="p-4" Elevation="4">
+    <MudText Typo="Typo.h6">Register as Student</MudText>
+
+    <MudForm @ref="registerForm" Model="student" Validate="true">
+        <MudTextField Label="Full Name" @bind-Value="student.Name" For="@(() => student.Name)" Required="true"/>
+        <MudTextField Label="Email" @bind-Value="student.Email" For="@(() => student.Email)" Required="true"/>
+        <MudTextField Label="Phone Number" @bind-Value="student.Phone" For="@(() => student.Phone)" Required="true"/>
+        <MudTextField Label="Password" @bind-Value="student.PasswordHash" For="@(() => student.PasswordHash)"
+                      Required="true" Type="password"/>
+
+        <MudButton OnClick="RegisterStudent" Color="Color.Primary" Class="mt-3">Register</MudButton>
+    </MudForm>
+
+    <MudSnackbarProvider/>
+</MudPaper>
+
+@code {
+    private StudentRegisterModel student = new StudentRegisterModel();
+
+    private MudForm registerForm;
+
+    private async Task RegisterStudent()
+    {
+        if (registerForm.IsValid)
+        {
+            var response = await UserApi.StudentRegister(student);
+
+            if (response.IsSuccess)
+            {
+                Snackbar.Add("Registration successful!", Severity.Success);
+                NavigationManager.NavigateTo("/Login");
+            }
+            else
+            {
+                Snackbar.Add("Registration failed. Please try again.", Severity.Error);
+            }
+        }
+    }
+
+
+}
