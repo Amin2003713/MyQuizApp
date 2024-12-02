@@ -1,0 +1,76 @@
+﻿@page "/Student/Home"
+
+
+<MudPaper Class="p-4" Elevation="4">
+    <MudText Typo="Typo.h6">Quizzes</MudText>
+
+    @if (categories == null || quizzes == null)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="my-4"/>
+        <MudText Typo="Typo.body1">Loading categories and quizzes...</MudText>
+    }
+    else if (!categories.Any())
+    {
+        <MudText Typo="Typo.body1" Color="Color.Secondary">No categories found.</MudText>
+    }
+    else
+    {
+        <MudExpansionPanels >
+        @foreach (var category in categories)
+        {
+            <MudExpansionPanel Text="@category.Name" Class="mt-4">
+                <MudList T="string" >
+                    @foreach (var quiz in quizzes.Where(q => q.CategoryId == category.Id))
+                    {
+                        <MudGrid>
+                            <MudItem lg="3" xxl="6" xs="12" xl="4"  sm="12"  md="4">
+                                <MudCard>
+                                    <MudCardContent>
+                                        <MudText Typo="Typo.body2">@quiz.Name</MudText>
+                                        <MudText
+                                            Typo="Typo.body1">@(quiz.Duration)</MudText>
+                                        <MudText Typo="Typo.body1">@quiz.QuestionCount</MudText>
+                                    </MudCardContent>
+                                    <MudCardActions>
+                                        <MudButton Variant="Variant.Text" Color="Color.Primary"
+                                                   @onclick="() => NavigateToQuiz(quiz.Id)">Participate in exam
+                                        </MudButton>
+                                    </MudCardActions>
+                                </MudCard>
+                            </MudItem>
+                        </MudGrid>
+                            
+                      
+                    }
+                </MudList>
+            </MudExpansionPanel>
+        }
+        </MudExpansionPanels> 
+    }
+</MudPaper>
+
+@code {
+
+   
+
+    private List<CategoryDto> categories;
+    private List<QuizDto> quizzes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var categoryResult = await CategoryApi.GetAllCategoriesAsync();
+        var quizResult    = await QuizApi.GetAllActiveQuizzesAsync();
+
+        if (categoryResult.IsSuccess && quizResult.IsSuccess)
+        {
+            categories = categoryResult.Data.ToList();
+            quizzes = quizResult.Data.ToList();
+        }
+    }
+
+    private void NavigateToQuiz(Guid quizId)
+    {
+        NavigationManager.NavigateTo($"/Quizzes/{quizId}");
+    }
+
+}

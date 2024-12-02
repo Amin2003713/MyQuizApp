@@ -7,10 +7,13 @@ using MyQuizApp.Infra.Users.Response;
 
 namespace MyQuizApp.Web.Services;
 
+using Domain.Users;
+using Infra.Users.Routs;
+using Microsoft.AspNetCore.Components;
 
 public class ClientStateProvider(
     ILocalStorageService storageService,
-    IUserApiClient userApiClient )
+    IUserApiClient userApiClient , NavigationManager navigationManager)
     : AuthenticationStateProvider
 {
 
@@ -73,11 +76,13 @@ private static readonly SemaphoreSlim Semaphore = new(1, 1);
             if (user == null)
             {
                 RemoveAuthenticatedUser();
+                navigationManager.NavigateTo("/login");
             }
             else
             {
                 LoggedUser = user;
                 SetAuthenticatedUser(user);
+                navigationManager.NavigateTo(user.UserRoles is UserRoles.Student ? "/Student/Home" : "/");
             }
         }
         finally

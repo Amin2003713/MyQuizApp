@@ -4,6 +4,8 @@ using MyQuizApp.WebApi.Data;
 
 namespace MyQuizApp.WebApi.Services;
 
+using Infra.Quiezzes;
+
 public class QuizService(Context context)
 {
     public async Task<ApiResponse> CreateQuizAsync(Quiz quiz)
@@ -49,6 +51,27 @@ public class QuizService(Context context)
         return ApiResponseWithData<List<Quiz>>.Success(quizzes);
     }
 
+
+    public async Task<ApiResponseWithData<List<QuizDto>>> GetAllActiveQuizzesAsync()
+    {
+        var quizzes = await context.Set<Quiz>()
+                                   .Where(a => a.IsActive)
+                                   .Include(q => q.Category) // Include Category navigation property
+                                    .Include(q => q.Questions) // Include Questions collection
+                                    .ThenInclude(q => q.Options) // Include Options collection within Questions
+                                    .Select(a=> new QuizDto
+                                    {
+                                        Duration = a.Duration,
+                                        Id = a.Id,
+                                        Name = a.Name,
+                                        CategoryId = a.CategoryId,
+                                        QuestionCount = a.Questions.Count,
+                                    })
+                                    .ToListAsync();
+
+
+        return ApiResponseWithData<List<QuizDto>>.Success(quizzes);
+    }
     public async Task<ApiResponse> UpdateQuizAsync(Quiz quiz)
     {
         try

@@ -16,6 +16,9 @@ public interface IQuizApi
     [Get("/api/quizzes/ListAll")]
     Task<ApiResponseWithData<IEnumerable<Quiz>>> GetAllQuizzesAsync();
 
+    [Get("/api/quizzes/ListActiveAll")]
+    Task<ApiResponseWithData<IEnumerable<QuizDto>>> GetAllActiveQuizzesAsync();
+
     [Put("/api/quizzes/{id}")]
     Task<ApiResponse> UpdateQuizAsync(Guid id, [Body] Quiz quiz);
 
@@ -27,4 +30,14 @@ public interface IQuizApi
 public static class QuizConst
 {
     public static string QuestionsStepper { get; set; } = "Question";
+}
+
+
+public class QuizDto
+{
+    public Guid Id { get; set; } = Guid.CreateVersion7();
+    public string Name { get; set; }
+    public int QuestionCount { get; set; } = 1;
+    public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(20);
+    public Guid CategoryId { get; set; }
 }

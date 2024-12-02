@@ -104,6 +104,12 @@ public static class Endpoints {
             var result = await quizService.GetAllQuizzesAsync();
             return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
         });
+        
+        group.MapGet("/ListActiveAll", async (QuizService quizService) =>
+        {
+            var result = await quizService.GetAllActiveQuizzesAsync();
+            return result.IsSuccess ? Results.Ok(result) : Results.BadRequest(result);
+        });
 
         group.MapPut("/{id:guid}", async (Guid id, Quiz quiz, QuizService quizService) =>
         {
