@@ -1,32 +1,35 @@
-﻿@page "/Admins/Quiz/AddQuizzes"
+﻿@page "/Admins/Quiz/AddOrEditQuizzes/{QuizId:guid?}"
 @using MyQuizApp.Domain.Quizzes
 @inject NavigationManager Navigation
 
 <MudPaper Class="p-4" Elevation="4">
-    <MudText Typo="Typo.h6">Create New Quiz</MudText>
+    <MudText Typo="Typo.h6">@PageTitle</MudText>
 
     <MudForm @ref="quizForm" Model="quiz" Validate="true">
         <MudTextField Label="Quiz Name" @bind-Value="quiz.Name" For="@(() => quiz.Name)" Required="true"/>
-        <MudDatePicker Label="Created On"  @bind-Date="quiz.CreatedOn" For="@(() => quiz.CreatedOn)" Required="true"/>
+        <MudDatePicker Label="Created On" @bind-Date="quiz.CreatedOn" For="@(() => quiz.CreatedOn)" Required="true"/>
         <MudTimePicker Label="Duration" @bind-TimeSpan="quiz.Duration" Required="true"/>
         <MudSelect T="Guid" Label="Category" @bind-Value="quiz.CategoryId" Required="true">
-                @if (Categories?.Any() == true)
+            @if (Categories?.Any() == true)
+            {
+                @foreach (var category in Categories)
                 {
-                    @foreach (var category in Categories)
-                    {
-                        <MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
-                    }
+                    <MudSelectItem Value="@category.Id">@category.Name</MudSelectItem>
                 }
-                else
-                {
-                    <MudSelectItem Value="Guid.Empty" Disabled="true">Loading categories...</MudSelectItem>
-                }
+            }
+            else
+            {
+                <MudSelectItem Value="Guid.Empty" Disabled="true">Loading categories...</MudSelectItem>
+            }
         </MudSelect>
 
         <MudTextField Label="Question Count" @bind-Value="quiz.QuestionCount" For="@(() => quiz.QuestionCount)"
-                      Min="1" Max="1000" Required="true"/>
+                      Min="1" Max="1000" Required="true" Disabled="@IsEditing"/>
 
-        <MudButton OnClick="AddQuestions" Color="Color.Primary" Class="mt-3">Add Questions</MudButton>
+        @if (!IsEditing)
+        {
+            <MudButton OnClick="AddQuestions" Color="Color.Primary" Class="mt-3">Add Questions</MudButton>
+        }
 
         <MudGrid>
             @foreach (var question in quiz.Questions)
@@ -56,45 +59,98 @@
             }
         </MudGrid>
 
-        <MudButton OnClick="SaveQuiz" Color="Color.Success" Class="mt-3">Save Quiz</MudButton>
+        <MudButton OnClick="SaveQuiz" Color="Color.Success" Class="mt-3">@SubmitButtonLabel</MudButton>
     </MudForm>
 </MudPaper>
 
 @code {
 
+    [Parameter]
+    public Guid? QuizId { get; set; } = null!;
+
     private List<CategoryDto> Categories;
 
-    private Quiz quiz = new Quiz
-    {
-        QuestionCount = 10, Questions = new List<Question>(10)
-    };
-
+    private Quiz quiz = new Quiz();
     private MudForm quizForm;
-
+    private bool IsEditing => QuizId.HasValue;
+    private string PageTitle => IsEditing ? "Edit Quiz" : "Add New Quiz";
+    private string SubmitButtonLabel => IsEditing ? "Update Quiz" : "Save Quiz";
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadCategories();
+
+        if (IsEditing)
+        {
+            await LoadQuizForEditing();
+        }
+        else
+        {
+            quiz = new Quiz
+            {
+                QuestionCount = 10, Questions = new List<Question>(10)
+            };
+        }
+    }
+
+    private async Task LoadCategories()
+    {
         var result = await CategoryApi.GetAllCategoriesAsync();
 
-        if (!result.IsSuccess)
-            return;
+        if (result.IsSuccess)
+        {
+            Categories = result.Data.ToList();
+        }
+        else
+        {
+            Snackbar.Add("Failed to load categories", Severity.Error);
+        }
+    }
 
-        Categories = (result).Data.ToList();
+    private async Task LoadQuizForEditing()
+    {
+        if (QuizId == null)
+        {
+            Snackbar.Add("Invalid quiz ID", Severity.Error);
+            Navigation.NavigateTo("/Admins/Quiz/ManageQuizzes");
+            return;
+        }
+
+        try
+        {
+            var result = await QuizApi.GetQuizByIdAsync(QuizId.Value);
+
+            if (result.IsSuccess)
+            {
+                quiz = result.Data;
+            }
+            else
+            {
+                Snackbar.Add("Failed to load quiz for editing", Severity.Error);
+                Navigation.NavigateTo("/Admins/Quiz/ManageQuizzes");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     private void AddQuestions()
     {
         // Add default questions if not already added
-        for (int i = quiz.Questions.Count; i < quiz.QuestionCount; i++)
+        for (var i = quiz.Questions.Count; i < quiz.QuestionCount; i++)
         {
             quiz.Questions.Add(
                 new Question
                 {
                     Text = string.Empty, Options = new List<Option>
                     {
-                        new Option { Text = string.Empty }, new Option { Text = string.Empty }
-                }
-            });
+                        new() { Text = string.Empty },
+                        new() { Text = string.Empty }
+                    }
+                });
         }
     }
 
@@ -102,17 +158,32 @@
     {
         if (quizForm.IsValid)
         {
-            var result =await QuizApi.CreateQuizAsync(quiz);
-            if(result.IsSuccess)
+            foreach (var quizQuestion in quiz.Questions)
             {
-                Navigation.NavigateTo("/quiz-list");
-                Snackbar.Add("Success", Severity.Success);
+                quizQuestion.QuizId = quiz.Id;
+                foreach (var option in quizQuestion.Options)
+                {
+                    option.QuestionId = quizQuestion.Id;
+                }
             }
 
-            Snackbar.Add("Failed", Severity.Error);
-            await quizForm.ResetAsync();
-        }
+            var result = IsEditing
+                ? await QuizApi.UpdateQuizAsync(QuizId.Value , quiz)
+                : await QuizApi.CreateQuizAsync(quiz);
 
-        var a  = quizForm.Errors;
+            if (result.IsSuccess)
+            {
+                Snackbar.Add(IsEditing ? "Quiz updated successfully" : "Quiz created successfully", Severity.Success);
+                Navigation.NavigateTo("/Admins/Quiz/ManageQuizzes");
+            }
+            else
+            {
+                Snackbar.Add("Failed to save quiz", Severity.Error);
+            }
+        }
+        else
+        {
+            Snackbar.Add("Please fix validation errors before submitting", Severity.Warning);
+        }
     }
 }

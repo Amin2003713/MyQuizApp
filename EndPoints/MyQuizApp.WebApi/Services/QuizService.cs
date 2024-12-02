@@ -6,17 +6,17 @@ namespace MyQuizApp.WebApi.Services;
 
 public class QuizService(Context context)
 {
-    public async Task<ApiResponseWithData<Quiz>> CreateQuizAsync(Quiz quiz)
+    public async Task<ApiResponse> CreateQuizAsync(Quiz quiz)
     {
         try
         {
             context.Set<Quiz>().Add(quiz);
             await context.SaveChangesAsync();
-            return ApiResponseWithData<Quiz>.Success(quiz);
+            return ApiResponse.Success("");
         }
         catch (Exception ex)
         {
-            return ApiResponseWithData<Quiz>.Failed(null, $"Error: {ex.Message}");
+            return ApiResponse.Failed($"Error: {ex.Message}");
         }
     }
 
@@ -34,13 +34,19 @@ public class QuizService(Context context)
         return ApiResponseWithData<Quiz>.Success(quiz);
     }
 
-    public async Task<ApiResponseWithData<IEnumerable<Quiz>>> GetAllQuizzesAsync()
+    public async Task<ApiResponseWithData<List<Quiz>>> GetAllQuizzesAsync()
     {
-        var quizzes = await context.Set<Quiz>()
-            .Include(q => q.Category)
-            .ToListAsync();
+        var quizzes = await context.Set<Quiz>().
+                                    Include(q => q.Category) // Include Category navigation property
+                                    .
+                                    Include(q => q.Questions) // Include Questions collection
+                                    .
+                                    ThenInclude(q => q.Options) // Include Options collection within Questions
+                                    .
+                                    ToListAsync();
 
-        return ApiResponseWithData<IEnumerable<Quiz>>.Success(quizzes);
+
+        return ApiResponseWithData<List<Quiz>>.Success(quizzes);
     }
 
     public async Task<ApiResponse> UpdateQuizAsync(Quiz quiz)

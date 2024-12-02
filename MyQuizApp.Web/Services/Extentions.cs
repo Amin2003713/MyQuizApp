@@ -17,9 +17,9 @@ public static class Extentions
 
         services.AddRefitClient<ICategoryApi>(CreateRefitSettings).
             ConfigureHttpClient(ConfigureHttpClient);
-        
+
         services.AddRefitClient<IQuizApi>(CreateRefitSettings).
-            ConfigureHttpClient(ConfigureHttpClient);
+                 ConfigureHttpClient(ConfigureHttpClient);
     }
 
     private static RefitSettings CreateRefitSettings(IServiceProvider provider)

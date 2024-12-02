@@ -8,7 +8,7 @@ namespace MyQuizApp.Infra.Quiezzes;
 public interface IQuizApi
 {
     [Post("/api/quizzes")]
-    Task<ApiResponseWithData<Quiz>> CreateQuizAsync([Body] Quiz quiz);
+    Task<ApiResponse> CreateQuizAsync([Body] Quiz quiz);
 
     [Get("/api/quizzes/{id}")]
     Task<ApiResponseWithData<Quiz>> GetQuizByIdAsync(Guid id);

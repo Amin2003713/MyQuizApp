@@ -10,6 +10,11 @@
                     <MudNavLink href="/Admins/Quiz/ManageQuizzes" Match="NavLinkMatch.Prefix">Manage Quizzes</MudNavLink>
                     <MudNavLink href="/Admins/Categories/ManageCategories" Match="NavLinkMatch.Prefix">Manage Categories</MudNavLink>
 
+
+                    <MudNavGroup Title="Settings">
+                        <MudNavLink Href="/Admin/Student/StudentList" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+                        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+                    </MudNavGroup>
                 </Authorized>
             </AuthorizeView>
 
@@ -25,10 +30,7 @@
         </Authorized>
     </AuthorizeView>
 
-    <MudNavGroup Title="Settings">
-        <MudNavLink Href="/users" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-    </MudNavGroup>   
+    
 
     <MudNavLink OnClick="@(async () =>
                            {

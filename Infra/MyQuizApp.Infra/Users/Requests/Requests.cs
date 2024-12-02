@@ -12,3 +12,11 @@ public class LoginRequests
         [MinLength(6, ErrorMessage = "رمز عبور باید حداقل ۶ کاراکتر باشد.")]
         public string Password { get; set; }
 }
+
+public class StudentRegisterModel
+{
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string PasswordHash { get; set; }
+}

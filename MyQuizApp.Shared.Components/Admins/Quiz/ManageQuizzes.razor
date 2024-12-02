@@ -2,88 +2,132 @@
 @using MyQuizApp.Infra.Quiezzes
 @using MyQuizApp.Domain.Quizzes
 @using Microsoft.AspNetCore.Components.Routing
+@using MyQuizApp.Shared.Components.Common.Quizzes
 @inject IQuizApi QuizApi
 
 <h1>Quiz List</h1>
 
-<MudProgressCircular Indeterminate="true" Visible="IsLoading"/>
 
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <MudAlert Severity="Severity.Error">@ErrorMessage</MudAlert>
-}
-else if (Quizzes != null && Quizzes.Any())
-{
-    <MudTable Items="Quizzes" Hover="true" Bordered="true" Striped="true">
-        <HeaderContent>
-            <MudTh>Quiz Name</MudTh>
-            <MudTh>Category</MudTh>
-            <MudTh>Actions</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="Quiz Name">@context.Name</MudTd>
-            <MudTd DataLabel="Category">@context.Category.Name</MudTd>
-            <MudTd DataLabel="Actions">
-                @* <MudButton Link="true" Color="Color.Info" Href="/quizzes/details/@context.Id" Size="Size.Small"> *@
-                @*     Details *@
-                @* </MudButton> *@
-                @* <MudButton Link="true" Color="Color.Warning" Href="/quizzes/edit/@context.Id" Size="Size.Small">Edit *@
-                @* </MudButton> *@
-                @* <MudButton Color="Color.Error" OnClick="() => DeleteQuiz(context.Id)" Size="Size.Small">Delete *@
-                @* </MudButton> *@
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
-}
-else
-{
-    <MudText>No quizzes available.</MudText>
-}
+<MudPaper Class="p-4" Elevation="4">
+    <MudText Typo="Typo.h6">Manage Quizzes</MudText>
+
+    @if (quizzes == null)
+    {
+        <MudProgressLinear Indeterminate="true" Color="Color.Primary" Class="my-4"/>
+        <MudText Typo="Typo.body1">Loading quizzes...</MudText>
+    }
+    else if (!quizzes.Any())
+    {
+        <MudText Typo="Typo.body1" Color="Color.Secondary">No quizzes found.</MudText>
+    }
+    else
+    {
+        <MudTable Items="quizzes" Dense="true" Bordered="true" Hover="true" Class="mt-3">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Category</MudTh>
+                <MudTh>Questions</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Name</MudTd>
+                <MudTd>@context.Category?.Name</MudTd>
+                <MudTd>@context.Questions.Count</MudTd>
+                <MudTd>
+                    <MudButton Color="Color.Info" Variant="Variant.Text" Size="Size.Small"
+                               OnClick="@(() => ShowQuestionsDialog(context))">
+                        <MudIcon Icon="@Icons.Material.Filled.Visibility"/>
+                    </MudButton>
+                    <MudButton Color="Color.Primary" Variant="Variant.Text" Size="Size.Small"
+                               OnClick="@(() => EditQuiz(context.Id))">
+                        <MudIcon Icon="@Icons.Material.Filled.Edit"/>
+                    </MudButton>
+                    <MudButton Color="Color.Error" Variant="Variant.Text" Size="Size.Small"
+                               OnClick="@(() => DeleteQuiz(context.Id))">
+                        <MudIcon Icon="@Icons.Material.Filled.Delete"/>
+                    </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
+
 
 <MudButton Color="Color.Primary" Variant="Variant.Filled">
-    <NavLink class="text-white" href="/Admins/Quiz/AddQuizzes">Add Quiz</NavLink>
+    <NavLink class="text-white" href="/Admins/Quiz/AddOrEditQuizzes">Add Quiz</NavLink>
 </MudButton>
 
 @code {
-    private IQueryable<Quiz> Quizzes { get; set; } = default!;
-    private bool IsLoading { get; set; } = true;
-    private string? ErrorMessage { get; set; }
+    private List<Quiz> quizzes;
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadQuizzes();
+    }
+
+    private async Task ShowQuestionsDialog(Quiz quiz)
+    {
+        var parameters = new DialogParameters
+        {
+            { "Quiz", quiz }
+        };
+
+        var options = new DialogOptions { CloseOnEscapeKey = true, MaxWidth = MaxWidth.Medium };
+
+        await DialogService.ShowAsync<QuestionDialog>("Quiz Questions", parameters, options);
+    }
+
+    private async Task LoadQuizzes()
+    {
         try
         {
-            var response = await QuizApi.GetAllQuizzesAsync();
-            if (response.IsSuccess)
+            // Fetch quizzes from the API
+            var result = await QuizApi.GetAllQuizzesAsync();
+            if (result.IsSuccess)
             {
-                Quizzes = response.Data.AsQueryable();
+                quizzes = ((result).Data!).ToList();
             }
             else
             {
-                ErrorMessage = response.Error;
+                Snackbar.Add("Failed to load quizzes", Severity.Error);
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            ErrorMessage = ex.Message;
+            Console.WriteLine(e);
+            throw;
         }
-        finally
-        {
-            IsLoading = false;
-        }
+    }
+
+    private void EditQuiz(Guid quizId)
+    {
+        NavigationManager.NavigateTo($"/Admins/Quiz/AddOrEditQuizzes/{quizId}");
     }
 
     private async Task DeleteQuiz(Guid quizId)
     {
-        var response = await QuizApi.DeleteQuizAsync(quizId);
-        if (response.IsSuccess)
+        var confirmed = await DialogService.ShowMessageBox(
+            "Confirm Delete"
+            , "Are you sure you want to delete this quiz?"
+            , yesText: "Yes"
+            , cancelText: "No"
+        );
+
+        if (confirmed!.Value)
         {
-            await OnInitializedAsync();
-            StateHasChanged();
+            var result = await QuizApi.DeleteQuizAsync(quizId);
+            if (result.IsSuccess)
+            {
+                Snackbar.Add("Quiz deleted successfully", Severity.Success);
+                await LoadQuizzes();
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete quiz", Severity.Error);
+            }
         }
-        else
-        {
-            ErrorMessage = response.Error;
-        }
+
+        await OnInitializedAsync();
     }
+
 }

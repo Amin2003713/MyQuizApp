@@ -15,5 +15,5 @@ public class Question
 
     [ForeignKey(nameof(QuizId))] public Quiz Quiz { get; set; }
 
-    public ICollection<Option> Options { get; set; } = new List<Option>(4);
+    public ICollection<Option> Options { get; set; } 
 }

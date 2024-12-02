@@ -5,10 +5,22 @@ using Refit;
 
 namespace MyQuizApp.Infra.Users;
 
+using Domain.Users;
+using WebApi.Services;
+
 public interface IUserApiClient
 {
     [Post(AuthRouts.Login)]
     Task<LoginResponse> Login(LoginRequests requests);
+    
+    [Post(AuthRouts.StudentRegister)]
+    Task<ApiResponse> StudentRegister(StudentRegisterModel requests);
+
+    [Get(AuthRouts.ListUsers)]
+    Task<ApiResponseWithData<List<User>>> ListUsers();
+
+    [Put("/users/activate/{userId}")]
+    Task<ApiResponse> StudentActivate(Guid userId);
 }
 
 public static class UserConst
