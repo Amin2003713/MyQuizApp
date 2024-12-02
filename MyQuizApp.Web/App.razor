@@ -1,7 +1,4 @@
-﻿@using Blazored.Modal
-
-
-<CascadingBlazoredModal>
+﻿
     <Router AppAssembly="@typeof(App).Assembly"
             AdditionalAssemblies="new[] { typeof(MyQuizApp.Shared.Components._Imports).Assembly }">
         <Found Context="routeData">
@@ -15,7 +12,7 @@
             </LayoutView>
         </NotFound>
     </Router>
-</CascadingBlazoredModal>
+
 
 @code
 

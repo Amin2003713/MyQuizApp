@@ -1,45 +1,51 @@
 ﻿@page "/Admins/Quiz/ManageQuizzes"
 @using MyQuizApp.Infra.Quiezzes
-@using Microsoft.AspNetCore.Components.QuickGrid
 @using MyQuizApp.Domain.Quizzes
 @using Microsoft.AspNetCore.Components.Routing
-
 @inject IQuizApi QuizApi
 
 <h1>Quiz List</h1>
 
-@if (IsLoading)
+<MudProgressCircular Indeterminate="true" Visible="IsLoading"/>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
 {
-    <p>Loading quizzes...</p>
-}
-else if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <p class="text-danger">@ErrorMessage</p>
+    <MudAlert Severity="Severity.Error">@ErrorMessage</MudAlert>
 }
 else if (Quizzes != null && Quizzes.Any())
 {
-    <QuickGrid Items="Quizzes" Class="table">
-        <PropertyColumn Title="Name" Property="quiz => quiz.Name"/>
-        <PropertyColumn Title="Category" Property="quiz => quiz.Category.Name"/>
-        <TemplateColumn Title="Actions">
-            <table context="quiz">
-                <a href="/quizzes/details/@context.Id" class="btn btn-info btn-sm">Details</a>
-                <a href="/quizzes/edit/@context.Id" class="btn btn-warning btn-sm">Edit</a>
-                <button class="btn btn-danger btn-sm" @onclick="() => DeleteQuiz(context.Id)">Delete</button>
-            </table>
-        </TemplateColumn>
-    </QuickGrid>
+    <MudTable Items="Quizzes" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Quiz Name</MudTh>
+            <MudTh>Category</MudTh>
+            <MudTh>Actions</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Quiz Name">@context.Name</MudTd>
+            <MudTd DataLabel="Category">@context.Category.Name</MudTd>
+            <MudTd DataLabel="Actions">
+                @* <MudButton Link="true" Color="Color.Info" Href="/quizzes/details/@context.Id" Size="Size.Small"> *@
+                @*     Details *@
+                @* </MudButton> *@
+                @* <MudButton Link="true" Color="Color.Warning" Href="/quizzes/edit/@context.Id" Size="Size.Small">Edit *@
+                @* </MudButton> *@
+                @* <MudButton Color="Color.Error" OnClick="() => DeleteQuiz(context.Id)" Size="Size.Small">Delete *@
+                @* </MudButton> *@
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
 }
 else
 {
-    <p>No quizzes available.</p>
-} 
-<button>
-    <NavLink class="btn btn-primary" href="/Admins/Quiz/AddQuizzes">Add Quiz</NavLink>
-</button>
+    <MudText>No quizzes available.</MudText>
+}
+
+<MudButton Color="Color.Primary" Variant="Variant.Filled">
+    <NavLink class="text-white" href="/Admins/Quiz/AddQuizzes">Add Quiz</NavLink>
+</MudButton>
 
 @code {
-    private IQueryable<Quiz> Quizzes { get; set; } =default!;
+    private IQueryable<Quiz> Quizzes { get; set; } = default!;
     private bool IsLoading { get; set; } = true;
     private string? ErrorMessage { get; set; }
 
@@ -80,7 +86,4 @@ else
             ErrorMessage = response.Error;
         }
     }
-
 }
-
-

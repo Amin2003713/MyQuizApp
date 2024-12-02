@@ -16,7 +16,7 @@ public class Quiz
     public int QuestionCount { get; set; } = 1;
 
     [Required(ErrorMessage = "تاریخ ایجاد نمی‌تواند خالی باشد.")]
-    public DateTime CreatedOn { get; set; } = DateTime.Now;
+    public DateTime? CreatedOn { get; set; } = DateTime.Now;
 
     [Required(ErrorMessage = "مدت‌زمان آزمون نمی‌تواند خالی باشد.")]
     public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(20);

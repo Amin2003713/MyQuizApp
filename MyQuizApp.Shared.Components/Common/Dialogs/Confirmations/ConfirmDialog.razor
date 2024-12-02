@@ -1,0 +1,26 @@
+@using MyQuizApp.Shared.Components.Common.Dialogs.Common
+@typeparam TType 
+<MudDialog>
+    <DialogContent>
+        <MudText Typo="Typo.h6">@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="() => CloseDialog(true)">
+            Yes
+        </MudButton>
+        <MudButton Variant="Variant.Text" Color="Color.Secondary" OnClick="@(() => DialogInstance.Cancel())">
+            No
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public string Message { get; set; } = "Are you sure?";
+    [Parameter] public TType Modal { get; set; }
+
+    [CascadingParameter] MudDialogInstance DialogInstance { get; set; }
+
+    private void CloseDialog(bool result) 
+        => DialogInstance.Close(new ModalResult<TType>(Modal , result));
+
+}

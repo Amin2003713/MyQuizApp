@@ -1,0 +1,140 @@
+﻿@using MyQuizApp.Domain.Quizzes
+@using MyQuizApp.Shared.Components.Common.Dialogs.Common
+@using MyQuizApp.Shared.Components.Common.Dialogs.Confirmations
+@using MyQuizApp.Shared.Components.Common.Quizzes
+@typeparam TType 
+
+
+<MudPaper>
+    <MudStepper @ref="ManageStepper" @bind-ActiveIndex="_currentIndex" CompletedStepColor="Color.Success" CurrentStepColor="Color.Primary"
+                NavClass="border-b mud-border-lines-default" StepClass="pt-4">
+
+        <TitleTemplate>
+            @Title
+        </TitleTemplate>
+
+        <ConnectorTemplate Context="step">
+            <div class="mud-stepper-nav-connector">
+                @{
+                    var value = step.Completed ? 100 : 0;
+                    <MudProgressLinear Indeterminate="@(step.IsActive)" Striped Value="value" Min="0" Max="100"
+                                       Color="Color.Success"
+                                       Style="height: 2px; background-color: #d4ddeb; border-radius: 2px;"/>
+                }
+            </div>
+        </ConnectorTemplate>
+
+        <LabelTemplate>
+            @if (context.IsActive)
+            {
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Style="rotate: 90deg;"
+                         Color="context.Completed ? Color.Success : Color.Primary"></MudIcon>
+            }
+            else if (context.Completed)
+            {
+                <div
+                    style="height: 10px; width:10px; background-color: var(--mud-palette-success); border-radius: 50%;"></div>
+            }
+            else
+            {
+                <div style="height: 10px; width:10px; background-color: #d4ddeb; border-radius: 50%;"></div>
+            }
+        </LabelTemplate>
+
+        <ChildContent>
+            @foreach (var question in DataType)
+            {
+                <MudStep Title="@GetTitle(question)" @bind-Completed="question.Completed">
+                    @Content
+                </MudStep>
+            }
+        </ChildContent>
+
+        <CompletedContent>
+            <MudStack Row Class="ma-3">
+                <MudIcon Icon="@Icons.Material.Filled.Done" Color="Color.Success"/>
+                <MudText>
+                    Quiz completed! Your responses have been submitted successfully.
+                </MudText>
+            </MudStack>
+        </CompletedContent>
+
+        <ActionContent Context="stepper">
+            <MudButton OnClick="@(() => ResetAsync())">Reset</MudButton>
+        </ActionContent>
+    </MudStepper>
+</MudPaper>
+
+@code {
+    [Parameter] public string? Title { get; set; } = "Quiz Steps";
+    [Parameter] public RenderFragment? Content { get; set; }
+    [Parameter] public required int StepCount { get; set; }
+    [Parameter] public EventCallback<TType> SendPreviousData { get; set; }
+
+
+    private int _currentIndex;
+    private bool _isCompleted;
+    private MudStepper ManageStepper;
+
+    private List<StepperDataInfo<TType>> DataType { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        for (var i = 0; i < StepCount; i++)
+        {
+                                     DataType.Add(new StepperDataInfo<TType>()
+                                     {
+                                         Completed = false ,
+                                         Index = i,
+                                         Data = (TType)Activator.CreateInstance(typeof(TType))!
+                                     });
+        }
+
+    }
+
+
+    private string? GetTitle(StepperDataInfo<TType> question) => $"Question: {question.Index + 1}";
+
+
+    public async Task PreviousStepAsync()
+    {
+        var lastData = DataType.FirstOrDefault(a => a.Index == _currentIndex);
+        await ManageStepper.PreviousStepAsync();
+        await SendPreviousData.InvokeAsync(lastData!.Data);
+    }
+
+
+    public async Task NextStepAsync(object data)
+    {
+        if (data is TType typedData)
+        {
+            // Safely cast to TType
+            DataType[_currentIndex].Data = typedData;
+            await SendPreviousData.InvokeAsync((TType)Activator.CreateInstance(typeof(TType))!);
+            await ManageStepper.NextStepAsync();
+
+        }
+    }
+
+    private async Task ResetAsync()
+    {
+        var parameters = new DialogParameters
+        {
+            { "Message", $"Do you want to reset ? \n All the Questions will be removed." }
+        };
+
+        var options = new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.Small };
+        var dialog  = await DialogService.ShowAsync<ConfirmDialog<ModalResult<bool>>>("Confirm Action", parameters, options);
+
+        if (dialog.Result.IsCanceled) return;
+
+        if (dialog.Result.Result!.Data! is not ModalResult<bool> { IsSuccess: true } modalResult)
+            return;
+
+        if (modalResult.Data == false)
+            return;
+
+        await ManageStepper.ResetAsync();
+    }
+
+}

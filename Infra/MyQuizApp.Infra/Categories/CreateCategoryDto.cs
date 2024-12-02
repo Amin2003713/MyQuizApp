@@ -1,3 +1,3 @@
 ﻿namespace MyQuizApp.WebApi.Services;
 
-public record CreateCategoryDto(string Name);
+public record CreateCategoryDto(string? Name);

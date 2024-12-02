@@ -12,12 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bit.BlazorUI" Version="9.0.1" />
-        <PackageReference Include="Bit.BlazorUI.Icons" Version="9.0.1" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.5.0" />
-        <PackageReference Include="Blazored.Modal" Version="7.3.1" />
-        <PackageReference Include="Blazorise.Bootstrap" Version="1.7.0" />
-        <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.QuickGrid" Version="9.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="9.0.0"/>
         <PackageReference Include="MudBlazor" Version="7.15.0" />
@@ -34,6 +29,7 @@
     <ItemGroup>
       <UpToDateCheckInput Remove="Quiz\Students\MyQuizzes.razor" />
       <UpToDateCheckInput Remove="Quiz\Students\_Imports.razor" />
+      <UpToDateCheckInput Remove="Admins\Categories\Common\Modal\AddCategory.razor" />
     </ItemGroup>
 
 </Project>

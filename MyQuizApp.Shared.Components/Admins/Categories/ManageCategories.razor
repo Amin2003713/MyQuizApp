@@ -1,56 +1,58 @@
 ﻿@page "/Admins/Categories/ManageCategories"
 
-@using Blazorise
-@using Bit.BlazorUI
-@using MyQuizApp.Infra.Categories
-@using Microsoft.AspNetCore.Components.QuickGrid
-@using MyQuizApp.Domain.Categories
-@using MyQuizApp.Shared.Components.Admins.Categories.Common.Modal
+@using MyQuizApp.Shared.Components.Common.Dialogs.Common
+@using MyQuizApp.Shared.Components.Common.Dialogs.Confirmations
+@using MyQuizApp.Shared.Components.Common.Dialogs.Edits
 @using MyQuizApp.WebApi.Services
-@using MyQuizApp.Shared.Components.Common.Modal
+@using Color = MudBlazor.Color
 <h3>ManageCategories</h3>
 
 
 <div>@Errors</div>
 
 
-<QuickGrid Items="Categories" Virtualize >
-    <PropertyColumn Property="@(p => p.Id)" Sortable="true"/>
-    <PropertyColumn Property="@(p => p.Name)"  Sortable="true"/>
-        <TemplateColumn Context="item" Title="Actions">
-            <button @onclick="() => Edit(item.Id)">Edit</button>
-            <button @onclick="() => Delete(item.Id)">Delete</button>
-        </TemplateColumn>
-</QuickGrid>
+<MudTable Items="Categories" Virtualize="true" SortLabel="Sort By" Hover>
+    <HeaderContent>
+        <MudTh>
+            <MudTableSortLabel SortBy="@(new Func<CategoryDto, object>(x => x.Id))">ID</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel SortBy="@(new Func<CategoryDto, object>(x => x.Name))">Name</MudTableSortLabel>
+        </MudTh>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AddDialog">
+            Add Category
+        </MudButton>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Id">@context.Id</MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="() => EditDialog(context)">
+                Edit
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="() => DeleteDialog(context)">
+                Delete
+            </MudButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
 
-<!-- Add Category Button -->             
-<hr>
-<Button Color="Color.Primary" @onclick="AddCategory">Add New Category</Button>   
-
-<hr>
-  
 
 
-<AddCategory Title="Edit Category" IsVisible="IsVisibleAdd" OnConfirmOrCancel="CallbackAdd" CategoryName=""/>
-<AddCategory Title="Edit Category" IsVisible="IsVisibleEdit" OnConfirmOrCancel="CallbackEdit" CategoryName="@CategoryName" Id="EditId"/>
-<Conferm LoadModel="OnInitializedAsync" @ref="DeleteModal" IsVisible="IsVisibleDelete" />
-    
+
+
+
 
 @code {
-    private IQueryable<CategoryDto>? Categories { get; set; } 
+    private IQueryable<CategoryDto>? Categories { get; set; }
     private string Errors { get; set; }
-    private string CategoryName { get; set; }
-    private bool IsVisibleAdd { get; set; } = false;
-    private bool IsVisibleEdit { get; set; } = false;
-    private bool IsVisibleDelete { get; set; } = false;
-    public Guid? EditId { get; set; }
-    public Conferm? DeleteModal { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Console.WriteLine(Guid.CreateVersion7());
 
-        var result =await CategoryApi.GetAllCategoriesAsync();
+        var result = await CategoryApi.GetAllCategoriesAsync();
         if (result.IsSuccess)
             Categories = result.Data.AsQueryable();
         else
@@ -58,56 +60,116 @@
     }
 
 
-    private void Edit(Guid id)
+    private async Task DeleteDialog(CategoryDto dto)
     {
-        IsVisibleEdit = !IsVisibleEdit;
-        CategoryName = Categories!.FirstOrDefault(a=>a.Id == id)!.Name;
-        EditId = id;
-    }
-
-    private void Delete(Guid id)
-    {
-        DeleteModal!.Category = Categories!.FirstOrDefault(a => a.Id == id)!;
-        IsVisibleDelete = !IsVisibleDelete;
-    }
-
-    private void AddCategory()
-    {
-        IsVisibleAdd = !IsVisibleAdd;
-    }
-
-    private async Task CallbackAdd((bool toggle, string name, Guid? Id) obj)
-    {
-        if (obj.toggle)
+        var parameters = new DialogParameters
         {
-            var category = new CreateCategoryDto(obj.name);
+            { "Message", $"Do you want to delete subject {dto.Name}?" }
+        };
 
-            var result =await CategoryApi.CreateCategoryAsync(category);
+        var options = new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.Small };
+        var dialog  = await DialogService.ShowAsync<ConfirmDialog<ModalResult<Guid>>>("Confirm Action", parameters, options);
 
-            if(!result.IsSuccess)
-                return;
+        if (dialog.Result.IsCanceled) return;
 
-            await OnInitializedAsync();
-            StateHasChanged();
+        if (dialog.Result.Result!.Data! is not ModalResult<Guid> { IsSuccess: true } modalResult)
+            return;
+
+        if (modalResult.Data == Guid.Empty)
+            return;
+
+
+        var result = await CategoryApi.DeleteCategoryAsync(modalResult.Data);
+        if (!result.IsSuccess)
+        {
+            Errors = result.Error;
+            return;
         }
 
-        IsVisibleAdd = !IsVisibleAdd;
+        await OnInitializedAsync();
     }
-    private async Task CallbackEdit((bool toggle, string name, Guid? Id) obj)
+
+
+    private async Task EditDialog(CategoryDto context)
     {
-        if (obj.toggle && obj.Id != Guid.Empty)
+        var updatedCategory = new UpdateCategoryDto(context.Name);
+        var parameters = new DialogParameters
         {
-            var updateDto = new UpdateCategoryDto(obj.name);
-            var result =await CategoryApi.UpdateCategoryAsync( obj.Id.Value , updateDto);
+            { "Title", "Edit Category" }, { "Modal", updatedCategory },
+            {
+                "Content", (RenderFragment)(builder =>
+                                            {
+                                                builder.OpenComponent<MudTextField<string>>(0);
+                                                builder.AddAttribute(1, "Label",        "Category Name");
+                                                builder.AddAttribute(2, "Value",        updatedCategory.Name);
+                                                builder.AddAttribute(3, "ValueChanged", EventCallback.Factory.Create<string>(this, value => updatedCategory = new UpdateCategoryDto(value)));
+                                                builder.CloseComponent();
+                                            })
+            }
+        };
 
-            if(!result.IsSuccess)
-                return;
+        var options = new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.Small };
+        var dialog  = await DialogService.ShowAsync<EditDialog<UpdateCategoryDto>>("Edit Category Dialog", parameters, options);
 
-            await OnInitializedAsync();
-            StateHasChanged();
-        }
+        var result = await dialog.Result; // Await dialog result to handle success/cancel logic if necessary
 
-        IsVisibleEdit = !IsVisibleEdit;
+
+        if (result!.Data! is not ModalResult<UpdateCategoryDto> { IsSuccess: true } modalResult)
+            return;
+
+        if (!modalResult.IsSuccess)
+            return;
+
+        var apiResult = await CategoryApi.UpdateCategoryAsync(context.Id, modalResult.Data);
+
+        if (!apiResult.IsSuccess)
+            Snackbar.Add("Error in server", Severity.Error);
+
+        await OnInitializedAsync();
+        StateHasChanged();
+        Snackbar.Add("All is Good", Severity.Success);
     }
+
+
+    private async Task AddDialog()
+    {
+        var updatedCategory = new CreateCategoryDto(null);
+        var parameters = new DialogParameters
+        {
+            { "Title", "New Category" }, { "Modal", updatedCategory },
+            {
+                "Content", (RenderFragment)(builder =>
+                                            {
+                                                builder.OpenComponent<MudTextField<string>>(0);
+                                                builder.AddAttribute(1, "Label",        "Category Name");
+                                                builder.AddAttribute(2, "Value",        updatedCategory.Name);
+                                                builder.AddAttribute(3, "ValueChanged", EventCallback.Factory.Create<string>(this, value => updatedCategory = new CreateCategoryDto(value)));
+                                                builder.CloseComponent();
+                                            })
+            }
+        };
+
+        var options = new DialogOptions { CloseButton = false, MaxWidth = MaxWidth.Small };
+        var dialog  = await DialogService.ShowAsync<EditDialog<CreateCategoryDto>>("Edit Category Dialog", parameters, options);
+
+        var result = await dialog.Result; // Await dialog result to handle success/cancel logic if necessary
+
+
+        if (result!.Data! is not ModalResult<CreateCategoryDto> { IsSuccess: true } modalResult)
+            return;
+
+        if (!modalResult.IsSuccess)
+            return;
+
+        var apiResult = await CategoryApi.CreateCategoryAsync(modalResult.Data);
+
+        if (!apiResult.IsSuccess)
+            Snackbar.Add("Error in server", Severity.Error);
+
+        await OnInitializedAsync();
+        StateHasChanged();
+        Snackbar.Add("All is Good", Severity.Success);
+    }
+
 
 }

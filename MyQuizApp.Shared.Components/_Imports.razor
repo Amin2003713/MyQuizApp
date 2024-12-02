@@ -1,8 +1,11 @@
 ﻿@inject   ICategoryApi CategoryApi
 @inject   IQuizApi QuizApi
 @inject    ILocalStorageService Local
-
 @inject   NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Forms
@@ -11,3 +14,4 @@
 @using MyQuizApp.Infra.Users
 @using MyQuizApp.Infra.Users.Requests
 @using MyQuizApp.Infra.Users.Response
+@using MudBlazor
