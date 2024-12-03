@@ -7,6 +7,7 @@
         <Authorized>
             <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
                 <Authorized Context="_">
+                    <MudNavLink href="/" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
                     <MudNavLink href="/Admins/Quiz/ManageQuizzes" Match="NavLinkMatch.Prefix">Manage Quizzes</MudNavLink>
                     <MudNavLink href="/Admins/Categories/ManageCategories" Match="NavLinkMatch.Prefix">Manage Categories</MudNavLink>
 
@@ -19,8 +20,9 @@
             </AuthorizeView>
 
             <AuthorizeView Roles="@(UserRoles.Student.ToString())">
-                <Authorized Context="_">
+                <Authorized Context="_">           
 
+                    <MudNavLink href="/Student/Home" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
                     <MudNavLink href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">My Quizzes</MudNavLink>
                     <MudNavLink href="/Student/Categories/ListCategories" Match="NavLinkMatch.Prefix">Get All Categories</MudNavLink>
 

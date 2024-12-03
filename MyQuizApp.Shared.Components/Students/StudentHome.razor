@@ -1,6 +1,5 @@
 ﻿@page "/Student/Home"
 
-
 <MudPaper Class="p-4" Elevation="4">
     <MudText Typo="Typo.h6">Quizzes</MudText>
 
@@ -15,51 +14,49 @@
     }
     else
     {
-        <MudExpansionPanels >
-        @foreach (var category in categories)
-        {
-            <MudExpansionPanel Text="@category.Name" Class="mt-4">
-                <MudList T="string" >
-                    @foreach (var quiz in quizzes.Where(q => q.CategoryId == category.Id))
-                    {
-                        <MudGrid>
-                            <MudItem lg="3" xxl="6" xs="12" xl="4"  sm="12"  md="4">
-                                <MudCard>
-                                    <MudCardContent>
-                                        <MudText Typo="Typo.body2">@quiz.Name</MudText>
-                                        <MudText
-                                            Typo="Typo.body1">@(quiz.Duration)</MudText>
-                                        <MudText Typo="Typo.body1">@quiz.QuestionCount</MudText>
-                                    </MudCardContent>
-                                    <MudCardActions>
-                                        <MudButton Variant="Variant.Text" Color="Color.Primary"
-                                                   @onclick="() => NavigateToQuiz(quiz.Id)">Participate in exam
-                                        </MudButton>
-                                    </MudCardActions>
-                                </MudCard>
-                            </MudItem>
-                        </MudGrid>
-                            
-                      
-                    }
-                </MudList>
-            </MudExpansionPanel>
-        }
-        </MudExpansionPanels> 
+        <MudTextField @bind-Value="searchQuery" Placeholder="Search quizzes..." Variant="Variant.Outlined"
+                      Class="mb-4"/>
+        <MudSelect T="CategoryDto" @bind-Value="selectedCategory" Label="Filter by category" Variant="Variant.Outlined"
+                   Class="mb-4">
+            <MudSelectItem T="CategoryDto" Value="null">All Categories</MudSelectItem>
+            @foreach (var category in categories)
+            {
+                <MudSelectItem T="CategoryDto" Value="@category">@category.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudGrid>
+            @foreach (var quiz in FilteredQuizzes)
+            {
+                <MudItem lg="3" xxl="6" xs="12" xl="4" sm="12" md="4">
+                    <MudCard>
+                        <MudCardContent>
+                            <MudText Typo="Typo.body2">@quiz.Name</MudText>
+                            <MudText Typo="Typo.body1">Duration: @(quiz.Duration) mins</MudText>
+                            <MudText Typo="Typo.body1">Questions: @quiz.QuestionCount</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="Variant.Text" Color="Color.Primary"
+                                       @onclick="() => NavigateToQuiz(quiz.Id)">Participate in exam
+                            </MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
     }
 </MudPaper>
 
 @code {
-
-   
-
     private List<CategoryDto> categories;
     private List<QuizDto> quizzes;
+    private string searchQuery = string.Empty;
+    private CategoryDto selectedCategory = null;
 
     protected override async Task OnInitializedAsync()
     {
         var categoryResult = await CategoryApi.GetAllCategoriesAsync();
-        var quizResult    = await QuizApi.GetAllActiveQuizzesAsync();
+        var quizResult     = await QuizApi.GetAllActiveQuizzesAsync();
 
         if (categoryResult.IsSuccess && quizResult.IsSuccess)
         {
@@ -67,6 +64,11 @@
             quizzes = quizResult.Data.ToList();
         }
     }
+
+    private IEnumerable<QuizDto> FilteredQuizzes => quizzes.Where(
+                                                                q => (string.IsNullOrEmpty(searchQuery) || q.Name.Contains(searchQuery, StringComparison.OrdinalIgnoreCase)) &&
+                                                                     (selectedCategory == null          || q.CategoryId == selectedCategory.Id)).
+                                                            ToList();
 
     private void NavigateToQuiz(Guid quizId)
     {

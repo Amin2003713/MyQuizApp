@@ -12,9 +12,20 @@
                 <MudTextField T="string" Label="Password" For="() => Requests.Password" @bind-Value="Requests.Password" InputType="InputType.Password"
                               Required="true" Immediate="true"/>
 
-                <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit" FullWidth="true" Class="mt-2">
-                    Login
-                </MudButton>
+                <MudGrid>
+                    <MudItem lg="6" md="6" sm="12" xl="6" xs="12" xxl="6">
+                        <MudButton Color="Color.Primary" Variant="Variant.Filled" ButtonType="ButtonType.Submit"
+                                   FullWidth="true" Class="mt-2">
+                            Login
+                        </MudButton>
+                    </MudItem>
+                    
+                    <MudItem lg="6" md="6" sm="12" xl="6" xs="12" xxl="6">
+                        <MudButton Href="/StudentRegister" Color="Color.Primary" Variant="Variant.Text" Ripple
+                                   StartIcon="@Icons.Material.TwoTone.Create">Register
+                        </MudButton>
+                    </MudItem>
+                </MudGrid>
             </EditForm>
         </MudCardContent>
         @if (Errors is not null)
@@ -22,9 +33,6 @@
             <MudAlert Severity="Severity.Error" Class="mt-2">@Errors</MudAlert>
         }
     </MudCard> 
-    <MudCardActions>
-        <MudButton Href="/StudentRegister" Color="Color.Primary" Variant="Variant.Text" StartIcon="@Icons.Material.TwoTone.Create">Register</MudButton>
-    </MudCardActions>
 </MudContainer>
 
 
