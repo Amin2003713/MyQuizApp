@@ -21,7 +21,7 @@ public interface IQuizApi
     [Get("/api/quizzes/GetForAttender/{id}")]
     Task<ApiResponseWithData<QuizDto>> GetQuizForAttendingByIdAsync(Guid id);
     
-    [Get("/api/quizzes/AllAttendedQuizzes/{studentId}")]
+    [Get("/api/quizzes/AllAttendedQuizzes")]
     Task<ApiResponseWithData<List<StudentQuiz>>> GetAllAttendedQuizzesAsync();
 
     [Get("/api/quizzes/ListAll")]

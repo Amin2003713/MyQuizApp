@@ -11,6 +11,11 @@
         <MudTable Items="StudentQuizResults" Dense="true" Hover="true" SortLabel="SortTable">
             <HeaderContent>
                 <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.Student.Name)">
+                        Attendee Name
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh>
                     <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.Quiz.Name)">
                         Quiz Name
                     </MudTableSortLabel>
@@ -32,6 +37,7 @@
                 </MudTh>
             </HeaderContent>
             <RowTemplate>
+                <MudTd>@context.Student.Name</MudTd>
                 <MudTd>@context.Quiz.Name</MudTd>
                 <MudTd>@context.Score</MudTd>
                 <MudTd>@context.StartedAt.ToString("yyyy-MM-dd HH:mm")</MudTd>

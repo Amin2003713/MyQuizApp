@@ -94,16 +94,16 @@ public class QuizService(Context context)
 
         if (user.UserRoles == UserRoles.Student)
         {
-            var attending = await context.StudentQuizzes.Where(s => s.StudentId == studentId).ToListAsync();
-
-            if(attending.Count == 0)
-                return ApiResponseWithData<List<StudentQuiz>>.Failed(null, "Attended quizzes not found.");
+           
+           
 
             var quizzes = await context.Set<StudentQuiz>()
                                        .Include(a=>a.Student)
-                                       .Include(a=>a.Quiz)
-                                       .Where(a=> attending.Any(q => q.QuizId == a.Id)).ToListAsync();
+                                       .Include(a=>a.Quiz).
+                                       Where(s => s.StudentId == studentId).ToListAsync();
 
+            if (quizzes.Count == 0)
+                return ApiResponseWithData<List<StudentQuiz>>.Failed(null, "Attended quizzes not found.");
 
             return ApiResponseWithData<List<StudentQuiz>>.Success(quizzes);
         }
@@ -121,10 +121,14 @@ public class QuizService(Context context)
 
     public async Task<ApiResponseWithData<int>> AttendQuiz(QuizAttendanceCommand command , Guid studentId)
     {
-        var quiz = (await GetQuizByIdAsync(command.QuizId)).Data;
+        var quiz = await context.Quizzes.Where(q => q.Id == command.QuizId).
+                                 Include(quiz => quiz.Questions).
+                                 ThenInclude(question => question.Options).
+                                 FirstOrDefaultAsync();
 
-        if (context.StudentQuizzes.Any(q => q.StudentId == studentId && q.QuizId == quiz.Id))
-            return ApiResponseWithData<int>.Failed(0 , "Quiz is already attended.");
+        if(quiz == null)
+            return ApiResponseWithData<int>.Failed(0, "Quiz is already attended.");
+
 
         var corrects = quiz.Questions.SelectMany(a => a.Options).Where(a => a.IsCorrectAnswer).Select(a=>a.Id).ToList();
         var selected = command.Questions.Select(a => a.QuestionId).ToList();

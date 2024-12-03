@@ -132,9 +132,7 @@
                 {
                     <MudIconButton OnClick="@(async () =>
                                               {
-                                                  if (_index + 1 == 1)
-                                                      _command.StartTime = DateTime.Now;
-                                                  if(_index - 1 == _dto.QuestionCount)
+                                                  if(_index >= _dto.QuestionCount)
                                                       _command.EndTime = DateTime.Now;
                                                   
                                                   if(_index - 1 is not  -1 && _command.Questions.Count <= _index -1 )
@@ -206,6 +204,7 @@
         }
 
         Isloaded = true;
+        _command.StartTime = DateTime.Now;
     }
 
     
@@ -226,6 +225,8 @@
 
     private async Task SubmitQuiz()
     {
+        _command.DurationTook = _command.EndTime - _command.StartTime;
+
         var result = await QuizApi.AddAttendeeAsync(_command);
 
         if(!result.IsSuccess)
