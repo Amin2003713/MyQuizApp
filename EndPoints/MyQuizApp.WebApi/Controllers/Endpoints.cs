@@ -98,6 +98,12 @@ public static class Endpoints {
             var result = await quizService.GetQuizByIdAsync(id);
             return result.IsSuccess ? Results.Ok(result) : Results.NotFound(result);
         });
+        
+        group.MapGet("/GetForAttender/{id:guid}", async (Guid id, QuizService quizService) =>
+        {
+            var result = await quizService.GetQuizForAttendingByIdAsync(id);
+            return result.IsSuccess ? Results.Ok(result) : Results.NotFound(result);
+        });
 
         group.MapGet("/ListAll", async (QuizService quizService) =>
         {

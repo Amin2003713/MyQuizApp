@@ -35,6 +35,39 @@ public class QuizService(Context context)
 
         return ApiResponseWithData<Quiz>.Success(quiz);
     }
+    
+    public async Task<ApiResponseWithData<QuizDto>> GetQuizForAttendingByIdAsync(Guid id)
+    {
+        var quiz = await context.Set<Quiz>()
+            .Include(q => q.Questions)
+            .ThenInclude(q => q.Options)
+            .Include(q => q.Category)
+            .Select(a=> new QuizDto
+            {
+                Duration = a.Duration,
+                Id = a.Id,
+                Name = a.Name,
+                CategoryId = a.CategoryId,
+                QuestionCount = a.Questions.Count,
+                CategoryName = a.Category.Name,
+                Questions = a.Questions.Select(w=> new QuestionDto
+                {
+                         Id = w.Id,
+                         Text = w.Text,
+                         Options =  w.Options.Select(e=> new OptionDto
+                         {
+                             Id = e.Id,
+                             Text = e.Text,
+                         }).ToList(),
+                }).ToList(),
+            })
+            .FirstOrDefaultAsync(q => q.Id == id);
+
+        if (quiz == null)
+            return ApiResponseWithData<QuizDto>.Failed(null, "Quiz not found.");
+
+        return ApiResponseWithData<QuizDto>.Success(quiz);
+    }
 
     public async Task<ApiResponseWithData<List<Quiz>>> GetAllQuizzesAsync()
     {
@@ -49,6 +82,12 @@ public class QuizService(Context context)
 
 
         return ApiResponseWithData<List<Quiz>>.Success(quizzes);
+    }
+
+
+    public async Task<ApiResponseWithData<int>> AttendQuiz(QuizAttendanceCommand quizAttendanceCommand)
+    {
+        return ApiResponseWithData<int>.Success(12);
     }
 
 

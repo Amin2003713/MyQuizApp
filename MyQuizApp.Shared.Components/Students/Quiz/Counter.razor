@@ -1,0 +1,49 @@
+@using System.Timers
+
+
+<div class="countdown">
+    <span>@DisplayTime</span>
+</div>
+
+
+@code {
+    [Parameter] public TimeSpan Duration { get; set; }
+    [Parameter] public bool IsTimerFinished { get; set; }
+
+
+    private Timer _timer;
+    private TimeSpan _remainingTime;
+    private string DisplayTime => _remainingTime.ToString(@"mm\:ss");
+
+    protected override void OnInitialized()
+    {
+        _remainingTime = Duration;
+        _timer = new Timer(1000); // 1-second interval
+        _timer.Elapsed += TimerElapsed!;
+    }
+
+    private void TimerElapsed(object sender, ElapsedEventArgs e)
+    {
+        if (_remainingTime.TotalSeconds > 0)
+        {
+            _remainingTime = _remainingTime.Subtract(TimeSpan.FromSeconds(1));
+            InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            _timer.Stop();
+            IsTimerFinished = false;
+        }
+    }
+
+    public void StartCountdown()
+    {
+        _remainingTime = Duration;
+        _timer.Start();
+    }
+
+
+
+}
+
+
