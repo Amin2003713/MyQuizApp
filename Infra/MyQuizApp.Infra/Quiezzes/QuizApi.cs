@@ -4,17 +4,25 @@ using Refit;
 
 namespace MyQuizApp.Infra.Quiezzes;
 
+using Domain.Users;
+
 [Headers("authorization: Bearer ")]
 public interface IQuizApi
 {
     [Post("/api/quizzes")]
-    Task<ApiResponse> CreateQuizAsync([Body] Quiz quiz);
+    Task<ApiResponse> CreateQuizAsync([Body] Quiz quiz); 
+    
+    [Post("/api/quizzes/AddAttendee")]
+    Task<ApiResponseWithData<int>> AddAttendeeAsync([Body] QuizAttendanceCommand quiz);
 
     [Get("/api/quizzes/{id}")]
     Task<ApiResponseWithData<Quiz>> GetQuizByIdAsync(Guid id);
 
     [Get("/api/quizzes/GetForAttender/{id}")]
     Task<ApiResponseWithData<QuizDto>> GetQuizForAttendingByIdAsync(Guid id);
+    
+    [Get("/api/quizzes/AllAttendedQuizzes/{studentId}")]
+    Task<ApiResponseWithData<List<StudentQuiz>>> GetAllAttendedQuizzesAsync();
 
     [Get("/api/quizzes/ListAll")]
     Task<ApiResponseWithData<IEnumerable<Quiz>>> GetAllQuizzesAsync();

@@ -1,150 +1,174 @@
 @page "/Students/QuizAttendance/{QuizId:guid}"
 
-<MudPaper Square Elevation="2" Style="border-bottom-color: violet">
+  @if (Isloaded)
+  {
+      <MudStepper
+          @bind-ActiveIndex="_index"
+          CompletedStepColor="Color.Success"
+          CurrentStepColor="Color.Primary"
+          ErrorStepColor="Color.Error"
+          NavClass="border-b mud-border-lines-default"
+          StepClass="pt-4"
+          CenterLabels>
+          <TitleTemplate/>
 
-    <MudStepper
-        @bind-ActiveIndex="_index"
-        CompletedStepColor="Color.Success"
-        CurrentStepColor="Color.Primary"
-        ErrorStepColor="Color.Error"
-        NavClass="border-b mud-border-lines-default"
-        StepClass="pt-4"
-        CenterLabels>
-        <TitleTemplate/>
-        
-        <ConnectorTemplate Context="step">
-            <div class="mud-stepper-nav-connector">
-                @{
-                    var value = step.Completed ? 100 : 0;
-                    <MudProgressLinear Indeterminate="@(step.IsActive)" Striped Value="value" Min="0" Max="100"
-                                       Color="Color.Success"
-                                       Style="height: 2px; background-color: #d4ddeb; border-radius: 2px;"/>
-                }
-            </div>
-        </ConnectorTemplate>
-        <LabelTemplate>
-            @if (context.IsActive)
-            {
-                <Counter
-                    IsTimerFinished="@IsFinished"
-                    Duration="@_dto.Duration"/>
-            }
-            else if (context.Completed)
-            {
-                <div
-                    style="height: 10px; width:10px; background-color: var(--mud-palette-success); border-radius: 50%;"></div>
-            }
-            else
-            {
-                <div style="height: 10px; width:10px; background-color: #d4ddeb; border-radius: 50%;"></div>
-            }
-        </LabelTemplate>
-        <ChildContent>
+          <ConnectorTemplate Context="step">
+              <div class="mud-stepper-nav-connector">
+                  @{
+                      var value = step.Completed ? 100 : 0;
+                      <MudProgressLinear Indeterminate="@(step.IsActive)" Striped Value="value" Min="0" Max="100"
+                                         Color="Color.Success"
+                                         Style="height: 2px; background-color: #d4ddeb; border-radius: 2px;"/>
+                  }
+              </div>
+          </ConnectorTemplate>
+          <LabelTemplate>
+              @if (context.IsActive)
+              {
+                  <MudIcon Icon="@Icons.Material.Rounded.SentimentSatisfiedAlt" Style="rotate: 90deg;"
+                           Color="context.Completed ? Color.Success : Color.Primary"></MudIcon>
+              }
+              else if (context.Completed)
+              {
+                  <div
+                      style="height: 10px; width:10px; background-color: var(--mud-palette-success); border-radius: 50%;"></div>
+              }
+              else
+              {
+                  <div style="height: 10px; width:10px; background-color: #d4ddeb; border-radius: 50%;"></div>
+              }
+          </LabelTemplate>
+          <ChildContent>
+              <MudStep Title="Before Exam">
+                  <MudPaper Class="p-4" Elevation="2" Style="background: rgba(34,34,34,0.93)">
+                      <MudText Typo="Typo.h6" GutterBottom="true">Pre-Exam Instructions</MudText>
 
-            <MudStep Title="Before Exam">
-                <MudPaper Class="p-4" Elevation="2" Style="background: rgba(34,34,34,0.93)">
-                    <MudText Typo="Typo.h6" GutterBottom="true">Pre-Exam Instructions</MudText>
+                      <MudText Typo="Typo.body1" GutterBottom="true">
+                          Please review the following important details about the exam:
+                      </MudText>
 
-                    <MudText Typo="Typo.body1" GutterBottom="true">
-                        Please review the following important details about the exam:
-                    </MudText>
+                      <MudList Dense="true" T="string">
+                          <MudListItem T="string">
+                              <MudText Typo="Typo.body2"><b>Exam
+                                      Time:</b> @_dto.Duration.TotalMinutes.ToString(@"mm\:ss") minutes.
+                              </MudText>
+                          </MudListItem>
+                          <MudListItem T="string">
+                              <MudText Typo="Typo.body2"><b>Total Questions:</b> @_dto.QuestionCount questions, each
+                                  carrying equal marks.
+                              </MudText>
+                          </MudListItem>
+                          <MudListItem T="string">
+                              <MudText Typo="Typo.body2"><b>Subject:</b> @_dto.CategoryName
+                              </MudText>
+                          </MudListItem>
+                          <MudListItem T="string">
+                              <MudText Typo="Typo.body2"><b>Rules:</b>
+                                  <ul>
+                                      <li>No electronic devices are allowed except approved calculators.</li>
+                                      <li>Ensure silence throughout the exam.</li>
+                                      <li>Carry your student ID and pen/pencil.</li>
+                                  </ul>
+                              </MudText>
+                          </MudListItem>
+                      </MudList>
+                  </MudPaper>
+              </MudStep>
 
-                    <MudList Dense="true" T="string">
-                        <MudListItem T="string">
-                            <MudText Typo="Typo.body2"><b>Exam Time:</b> @_dto.Duration.TotalMinutes.ToString(@"mm\:ss") minutes.
-                            </MudText>
-                        </MudListItem>
-                        <MudListItem T="string">
-                            <MudText Typo="Typo.body2"><b>Total Questions:</b> @_dto.QuestionCount questions, each carrying equal marks.
-                            </MudText>
-                        </MudListItem >
-                        <MudListItem T="string">
-                            <MudText Typo="Typo.body2"><b>Subject:</b> @_dto.CategoryName
-                            </MudText>
-                        </MudListItem>
-                        <MudListItem T="string">
-                            <MudText Typo="Typo.body2"><b>Rules:</b>
-                                <ul>
-                                    <li>No electronic devices are allowed except approved calculators.</li>
-                                    <li>Ensure silence throughout the exam.</li>
-                                    <li>Carry your student ID and pen/pencil.</li>
-                                </ul>
-                            </MudText>
-                        </MudListItem>
-                    </MudList>
-                </MudPaper>
-            </MudStep>
+              @foreach (var question in _dto.Questions)
+              {
+                  <MudStep Skippable="false">
 
-            @foreach (var question in _dto.Questions)
-            {
-                <MudStep Skippable="false">
-                    
-                    <MudText Typo="Typo.h2" Align="Align.Start">
-                        @question.Text
-                    </MudText>
+                      <MudText Typo="Typo.h2" Align="Align.Start">
+                          @question.Text
+                      </MudText>
 
                     <MudRadioGroup T="Guid" ValueChanged="(value) => OnOptionChanged(question.Id, value)">
-                    @foreach (var option in question.Options)
-                    {
-                        <MudRadio
-                            Value="option.Id"
-                            Color="Color.Primary"
-                            UncheckedColor="Color.Secondary"
-                            Placement="Placement.Start">
-                            @option.Text
-                        </MudRadio>
-                    }
-                    </MudRadioGroup>
+                          @foreach (var option in question.Options)
+                          {
+                              <MudRadio
+                                  Value="option.Id"
+                                  Color="Color.Primary"
+                                  UncheckedColor="Color.Secondary"
+                                  Placement="Placement.Start">
+                                  @option.Text
+                              </MudRadio>
+                          }
+                      </MudRadioGroup>
 
-                </MudStep>
-            }
-           
-        </ChildContent>
-        <CompletedContent>
-            <MudStack Row Class="ma-3" AlignItems="AlignItems.Center">
-                <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Color="Color.Success"/>
-                <MudText>
-                    Thank you for participating in the exam! Your responses have been submitted successfully.
-                    <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="ViewReport">
-                        View Detailed Report
-                    </MudButton>
-                    Results will be announced soon.
-                </MudText>
-            </MudStack>
-        </CompletedContent>
-        <ActionContent Context="stepper">
-            @if (!_completed)
-            {
-                <MudIconButton OnClick="@(() => stepper.PreviousStepAsync())" Icon="@Icons.Material.Filled.ArrowBack"
-                               Color="Color.Primary" Disabled="@(_index <= 0)"/>
-                <MudSpacer/>
-                @if ( _command.Questions[_index].OptionSelected != Guid.Empty)
+                  </MudStep>
+              }
+
+          </ChildContent>
+          <CompletedContent>
+              <MudStack Row Class="ma-3" AlignItems="AlignItems.Center">
+                  <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Color="Color.Success"/>
+                  <MudText>
+                      Thank you for participating in the exam! Your responses have been submitted successfully.
+                      <MudButton Variant="Variant.Text" Color="Color.Primary" @onclick="ViewReport">
+                          View Detailed Report
+                      </MudButton>
+                      Results will be announced soon.
+                  </MudText>
+              </MudStack>
+          </CompletedContent>
+          <ActionContent Context="stepper">
+              @if (!_completed)
+              {
+                  <MudIconButton OnClick="@(() =>
+                                            {
+                                                if (_index > 0)
+                                                    stepper.PreviousStepAsync();
+                                            })" Icon="@Icons.Material.Filled.ArrowBack"
+                                 Color="Color.Primary" Disabled="@(_index <= 0)"/>
+                  <MudSpacer/> 
+                  @if (_index == 0)
+                  {
+                      <MudIconButton OnClick="@(() => stepper.NextStepAsync())"
+                                     Icon="@Icons.Material.Filled.ArrowForward" Color="Color.Primary"/>
+
+                  }
+                  else if ( _index  <= _command.Questions.Count ||   _command.Questions[_index - 1].OptionSelected == Guid.Empty)
                 {
                     <MudIconButton OnClick="@(async () =>
                                               {
-                                                  if (_index == 1)
+                                                  if (_index + 1 == 1)
                                                       _command.StartTime = DateTime.Now;
-                                                  else
+                                                  if(_index - 1 == _dto.QuestionCount)
                                                       _command.EndTime = DateTime.Now;
                                                   
-                                                  _command.Questions[_index].AtDatetime = DateTime.Now;
+                                                  if(_index - 1 is not  -1 && _command.Questions.Count <= _index -1 )
+                                                    _command.Questions[_index -1].AtDatetime = DateTime.Now;
+
+                                                  _completed = stepper.IsCompleted;               
                                                   await stepper.NextStepAsync();
                                               })" Icon="@Icons.Material.Filled.ArrowForward"
                                    Color="Color.Primary"/>
                 }
-            }
-        </ActionContent>
+              }
+              else
+              {
+                  <MudSpacer/>
+                  <MudButton OnClick="SubmitQuiz">Submit</MudButton>
+              }
+          </ActionContent>
     </MudStepper>
-</MudPaper>
+  }
+  else
+  {
+      <div>wait for some seconds</div>
+  }
 
 
-@code {      
+
+  @code {      
     [Parameter] public Guid QuizId { get; set; }
-    private int _index;
-    private bool _completed;
+    private int _index = 0;
+    private bool _completed = false;
     private QuizDto _dto;
     private QuizAttendanceCommand _command { get; set; } = new() ;
     public bool IsFinished { get; set; }
+    public bool Isloaded { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -181,19 +205,35 @@
             });
         }
 
+        Isloaded = true;
     }
 
     
 
     private void ViewReport()
     {
+        
     }
 
     private void OnOptionChanged(Guid questionId, Guid value)
     {
         var  question = _command.Questions.FindIndex(a => a.QuestionId == questionId);
-
         _command.Questions[question].OptionSelected = value;
+        value = Guid.Empty;
+        StateHasChanged();
+
     }
 
-}
+    private async Task SubmitQuiz()
+    {
+        var result = await QuizApi.AddAttendeeAsync(_command);
+
+        if(!result.IsSuccess)
+            Snackbar.Add($"went wrong ....\n {result.Error}", Severity.Error);
+
+        Snackbar.Add($"ur score is : {result.Data}", Severity.Success);
+
+        NavigationManager.NavigateTo("/Student/Quiz/MyQuizzes");
+    }
+
+  }

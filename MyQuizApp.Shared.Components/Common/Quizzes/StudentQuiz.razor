@@ -1,0 +1,66 @@
+@using MyQuizApp.Domain.Users
+<MudPaper Class="p-4" Elevation="4">
+    <MudText Typo="Typo.h4" GutterBottom="true">Quiz Results</MudText>
+
+    @if (StudentQuizResults == null || !StudentQuizResults.Any())
+    {
+        <MudText Typo="Typo.body1" Color="Color.Secondary">No quiz results to display.</MudText>
+    }
+    else
+    {
+        <MudTable Items="StudentQuizResults" Dense="true" Hover="true" SortLabel="SortTable">
+            <HeaderContent>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.Quiz.Name)">
+                        Quiz Name
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.Score)">
+                        Score
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.StartedAt)">
+                        Start Time
+                    </MudTableSortLabel>
+                </MudTh>
+                <MudTh>
+                    <MudTableSortLabel SortBy="new Func<Domain.Users.StudentQuiz, object>(x => x.EndedAt)">
+                        End Time
+                    </MudTableSortLabel>
+                </MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Quiz.Name</MudTd>
+                <MudTd>@context.Score</MudTd>
+                <MudTd>@context.StartedAt.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                <MudTd>@context.EndedAt.ToString("yyyy-MM-dd HH:mm")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudPaper>
+
+@code {
+    private List<Domain.Users.StudentQuiz> StudentQuizResults { get; set; } = null!;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+
+        var result = await QuizApi.GetAllAttendedQuizzesAsync();
+
+        if (result.IsSuccess)
+        {
+            StudentQuizResults = result.Data;
+        }
+        else
+        {
+            Snackbar.Add(result.Error, Severity.Error);
+        }
+
+        _loading = false;
+    }
+   
+}

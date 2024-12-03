@@ -4,6 +4,7 @@ using MyQuizApp.WebApi.Data;
 
 namespace MyQuizApp.WebApi.Services;
 
+using Domain.Users;
 using Infra.Quiezzes;
 
 public class QuizService(Context context)
@@ -84,10 +85,63 @@ public class QuizService(Context context)
         return ApiResponseWithData<List<Quiz>>.Success(quizzes);
     }
 
-
-    public async Task<ApiResponseWithData<int>> AttendQuiz(QuizAttendanceCommand quizAttendanceCommand)
+    public async Task<ApiResponseWithData<List<StudentQuiz>>> GetAllAttendedQuizzesAsync(Guid studentId)
     {
-        return ApiResponseWithData<int>.Success(12);
+        var user =await context.Users.FindAsync(studentId);
+
+        if (user is null)
+            return ApiResponseWithData<List<StudentQuiz>>.Failed(null, "User was not found.");
+
+        if (user.UserRoles == UserRoles.Student)
+        {
+            var attending = await context.StudentQuizzes.Where(s => s.StudentId == studentId).ToListAsync();
+
+            if(attending.Count == 0)
+                return ApiResponseWithData<List<StudentQuiz>>.Failed(null, "Attended quizzes not found.");
+
+            var quizzes = await context.Set<StudentQuiz>()
+                                       .Include(a=>a.Student)
+                                       .Include(a=>a.Quiz)
+                                       .Where(a=> attending.Any(q => q.QuizId == a.Id)).ToListAsync();
+
+
+            return ApiResponseWithData<List<StudentQuiz>>.Success(quizzes);
+        }
+        else
+        {
+            var quizzes = await context.Set<StudentQuiz>().
+                                        Include(a => a.Student).
+                                        Include(a => a.Quiz).
+                                        ToListAsync();
+
+
+            return ApiResponseWithData<List<StudentQuiz>>.Success(quizzes);
+        }
+    }
+
+    public async Task<ApiResponseWithData<int>> AttendQuiz(QuizAttendanceCommand command , Guid studentId)
+    {
+        var quiz = (await GetQuizByIdAsync(command.QuizId)).Data;
+
+        if (context.StudentQuizzes.Any(q => q.StudentId == studentId && q.QuizId == quiz.Id))
+            return ApiResponseWithData<int>.Failed(0 , "Quiz is already attended.");
+
+        var corrects = quiz.Questions.SelectMany(a => a.Options).Where(a => a.IsCorrectAnswer).Select(a=>a.Id).ToList();
+        var selected = command.Questions.Select(a => a.QuestionId).ToList();
+        var scored = corrects.Intersect(selected).Count();
+
+        var score = 100 / quiz.QuestionCount * scored; 
+
+        var attende = new StudentQuiz()
+        {
+            QuizId = quiz.Id, StudentId = studentId, Score = score, EndedAt = command.EndTime
+            , StartedAt = command.StartTime,
+
+        };
+
+        context.Set<StudentQuiz>().Add(attende);
+        await context.SaveChangesAsync();
+        return ApiResponseWithData<int>.Success(score);
     }
 
 

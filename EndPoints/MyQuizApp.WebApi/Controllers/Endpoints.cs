@@ -10,7 +10,9 @@ using MyQuizApp.WebApi.Services;
 
 namespace MyQuizApp.WebApi.Controllers;
 
+using System.Security.Claims;
 using Data;
+using Infra.Quiezzes;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -92,6 +94,18 @@ public static class Endpoints {
                 ? Results.Ok(ApiResponse.Success("WellDone"))
                 : Results.BadRequest(result);
         });
+        
+        
+        group.MapPost("/AddAttendee", async (QuizAttendanceCommand quiz, QuizService quizService , HttpContext httpContext) =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+
+            var result = await quizService.AttendQuiz(quiz , Guid.Parse((ReadOnlySpan<char>)userId));
+            return result.IsSuccess
+                ? Results.Ok(ApiResponse.Success("WellDone"))
+                : Results.BadRequest(result);
+        });
 
         group.MapGet("/{id:guid}", async (Guid id, QuizService quizService) =>
         {
@@ -102,6 +116,18 @@ public static class Endpoints {
         group.MapGet("/GetForAttender/{id:guid}", async (Guid id, QuizService quizService) =>
         {
             var result = await quizService.GetQuizForAttendingByIdAsync(id);
+            return result.IsSuccess ? Results.Ok(result) : Results.NotFound(result);
+        });
+        
+        group.MapGet("/AllAttendedQuizzes", async ( QuizService quizService
+                                                          , HttpContext httpContext) =>
+        {
+            var studentId = httpContext.User.
+                FindFirst(ClaimTypes.NameIdentifier)?.
+                Value;
+
+
+            var result = await quizService.GetAllAttendedQuizzesAsync(Guid.Parse((ReadOnlySpan<char>)studentId));
             return result.IsSuccess ? Results.Ok(result) : Results.NotFound(result);
         });
 
