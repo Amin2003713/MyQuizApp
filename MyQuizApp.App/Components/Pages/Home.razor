@@ -5,3 +5,11 @@
 Welcome to your new app.
 
 
+@code
+{
+    protected override void OnInitialized()
+    {
+        if(!AuthState.IsLoggedIn)
+            NavigationManager.NavigateTo("/Login");
+    }
+}

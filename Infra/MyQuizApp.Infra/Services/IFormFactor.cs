@@ -6,9 +6,11 @@ using Refit;
 
 namespace MyQuizApp.Infra.Services;
 
+using Common;
+
 public interface IFormFactor
 {
-    public string GetFormFactor();
+    public ApplicationTypes GetFormFactor();
     public string GetPlatform();
 }
 

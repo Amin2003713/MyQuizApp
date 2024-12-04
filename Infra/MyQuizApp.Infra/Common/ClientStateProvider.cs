@@ -9,11 +9,13 @@ namespace MyQuizApp.Infra.Common;
 
 using Domain.Users;
 using Microsoft.AspNetCore.Components;
+using Services;
 
 public class ClientStateProvider(
     ILocalStorage storageService,
     IUserApiClient userApiClient ,
-    NavigationManager navigationManager)
+    NavigationManager navigationManager,
+    IFormFactor formFactor)
     : AuthenticationStateProvider
 {
 
@@ -78,12 +80,19 @@ public class ClientStateProvider(
                 if (user == null)
                 {
                     RemoveAuthenticatedUser();
+                    if(formFactor.GetFormFactor() == ApplicationTypes.Maui)
+                        return;
+
                     navigationManager.NavigateTo("/login");
                 }
                 else
                 {
                     LoggedUser = user;
                     SetAuthenticatedUser(user);
+
+                    if (formFactor.GetFormFactor() == ApplicationTypes.Maui)
+                        return;
+
                     navigationManager.NavigateTo(user.UserRoles is UserRoles.Student ? "/Student/Home" : "/");
                 }
             }

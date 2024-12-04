@@ -9,9 +9,9 @@ using Infra.Users.Response;
 
 public class FormFactor : IFormFactor
 {
-    public string GetFormFactor()
+    public ApplicationTypes GetFormFactor()
     {
-        return "WebAssembly";
+        return ApplicationTypes.Web;
     }
 
     public string GetPlatform()
