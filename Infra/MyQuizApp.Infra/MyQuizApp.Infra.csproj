@@ -16,4 +16,13 @@
       <PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Microsoft.iOS">
+        <HintPath>C:\Program Files\dotnet\packs\Microsoft.iOS.Ref.net9.0_18.1\18.1.9163\ref\net9.0\Microsoft.iOS.dll</HintPath>
+      </Reference>
+      <Reference Include="Mono.Android">
+        <HintPath>C:\Program Files\dotnet\packs\Microsoft.Android.Ref.35\35.0.7\ref\net9.0\Mono.Android.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

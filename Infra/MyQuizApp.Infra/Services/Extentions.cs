@@ -5,9 +5,11 @@ using Refit;
 
 namespace MyQuizApp.Web.Services;
 
+using System.Net.Security;
 using Infra.Common;
 using Infra.Services;
 using Microsoft.Extensions.DependencyInjection;
+
 
 public static class Extentions
 {
@@ -18,7 +20,7 @@ public static class Extentions
     public static void AddRefitConfig(this IServiceCollection services )
     {
 
-        services.AddRefitClient<IUserApiClient>().
+        services.AddRefitClient<IUserApiClient>(CreateRefitSettings).
             ConfigureHttpClient(ConfigureHttpClient);
 
 
@@ -35,7 +37,30 @@ public static class Extentions
 
         return new RefitSettings()
         {
-            AuthorizationHeaderValueGetter = (_, _) => Task.FromResult(token.LoggedUser?.Token ?? "")
+            AuthorizationHeaderValueGetter = (_, _) => Task.FromResult(token.LoggedUser?.Token ?? "") ,
+            HttpMessageHandlerFactory = () =>
+                                        {
+                                            if (OperatingSystem.IsAndroid())
+                                            {
+                                                var android = new Xamarin.Android.Net.AndroidMessageHandler();
+                                                android.ServerCertificateCustomValidationCallback
+                                                    = (_, cert, chain, sslPolicyErrors) =>
+                                                          cert.Issuer        == "CN==localhost"
+                                                          || sslPolicyErrors == SslPolicyErrors.None;
+
+                                                return android;
+                                            }
+                                            else if (OperatingSystem.IsIOS())
+                                            {
+                                                var msUilSession = new NSUrlSessionHandler();
+                                                msUilSession.TrustOverrideForUrl = (sender, url, trust)
+                                                        => url.StartsWith(BaseUrl);
+
+                                                return msUilSession;
+                                            }
+
+                                            return default!;
+                                        }
         };
     }
 

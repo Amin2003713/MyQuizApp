@@ -26,9 +26,13 @@ public static class MauiProgram
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
-		builder.Services.AddLogging(
-			logging => { logging.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Trace); });
 		builder.Logging.AddDebug();
+		AppDomain.CurrentDomain.UnhandledException += (s, e) =>
+		                                                {
+			                                                System.Diagnostics.Debug.WriteLine(
+				                                                "********** OMG! FirstChanceException **********");
+			                                                System.Diagnostics.Debug.WriteLine(e);
+		                                                };
 #endif
 
 		builder.Services.AddSingleton<ILocalStorage ,MauiLocalStorage >();
