@@ -2,6 +2,14 @@
 
 namespace MyQuizApp.App;
 
+using Blazored.LocalStorage;
+using Infra.Common;
+using Infra.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using MudBlazor.Services;
+using Services;
+using Web.Services;
+
 public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
@@ -18,8 +26,21 @@ public static class MauiProgram
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
+		builder.Services.AddLogging(
+			logging => { logging.AddFilter("Microsoft.AspNetCore.Components.WebView", LogLevel.Trace); });
 		builder.Logging.AddDebug();
 #endif
+
+		builder.Services.AddSingleton<ILocalStorage ,MauiLocalStorage >();
+		builder.Services.AddMudServices();
+		builder.Services.AddCascadingAuthenticationState();
+		builder.Services.AddAuthorizationCore();
+		builder.Services.AddSingleton<ClientStateProvider>();
+		builder.Services.AddSingleton<AuthenticationStateProvider>(
+			provider => provider.GetRequiredService<ClientStateProvider>());
+		builder.Services.AddSingleton<IFormFactor, FormFactor>();
+		builder.Services.AddRefitConfig();
+
 
 		return builder.Build();
 	}

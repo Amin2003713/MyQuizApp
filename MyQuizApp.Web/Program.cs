@@ -17,6 +17,7 @@ builder.Services.AddMudBlazorSnackbar();
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddAuthorizationCore();
 builder.Services.AddSingleton<ClientStateProvider>();
+builder.Services.AddSingleton<ILocalStorage , WebLocalStorage>();
 builder.Services.AddSingleton<AuthenticationStateProvider>(provider => provider.GetRequiredService<ClientStateProvider>());
 builder.Services.AddSingleton<IFormFactor, FormFactor>();
 builder.Services.AddRefitConfig();

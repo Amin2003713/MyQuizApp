@@ -11,8 +11,9 @@ using Domain.Users;
 using Microsoft.AspNetCore.Components;
 
 public class ClientStateProvider(
-    ILocalStorageService storageService,
-    IUserApiClient userApiClient , NavigationManager navigationManager)
+    ILocalStorage storageService,
+    IUserApiClient userApiClient ,
+    NavigationManager navigationManager)
     : AuthenticationStateProvider
 {
 
@@ -67,28 +68,36 @@ public class ClientStateProvider(
 
     public async Task SetAuthenticatedUser()
     {
-        await Semaphore.WaitAsync(); 
         try
         {
-            var user = await storageService.GetItemAsync<LoggedUser>(UserConst.UserInfo);
+            await Semaphore.WaitAsync();
+            try
+            {
+                var user = await storageService.GetItemAsync<LoggedUser>(UserConst.UserInfo);
 
-            if (user == null)
-            {
-                RemoveAuthenticatedUser();
-                navigationManager.NavigateTo("/login");
+                if (user == null)
+                {
+                    RemoveAuthenticatedUser();
+                    navigationManager.NavigateTo("/login");
+                }
+                else
+                {
+                    LoggedUser = user;
+                    SetAuthenticatedUser(user);
+                    navigationManager.NavigateTo(user.UserRoles is UserRoles.Student ? "/Student/Home" : "/");
+                }
             }
-            else
+            finally
             {
-                LoggedUser = user;
-                SetAuthenticatedUser(user);
-                navigationManager.NavigateTo(user.UserRoles is UserRoles.Student ? "/Student/Home" : "/");
+                IsInitialized = true;
+                NotifyAuthenticationStateChanged(_authenticationStateTask);
+                Semaphore.Release(); // Release the lock
             }
         }
-        finally
+        catch (Exception e)
         {
-            IsInitialized = true;
-            NotifyAuthenticationStateChanged(_authenticationStateTask);
-            Semaphore.Release(); // Release the lock
+            Console.WriteLine(e);
+            throw;
         }
     }
 

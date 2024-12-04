@@ -6,6 +6,7 @@ using Refit;
 namespace MyQuizApp.Web.Services;
 
 using Infra.Common;
+using Microsoft.Extensions.DependencyInjection;
 
 public static class Extentions
 {
