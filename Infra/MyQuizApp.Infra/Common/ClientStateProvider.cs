@@ -5,10 +5,9 @@ using MyQuizApp.Infra.Users;
 using MyQuizApp.Infra.Users.Requests;
 using MyQuizApp.Infra.Users.Response;
 
-namespace MyQuizApp.Web.Services;
+namespace MyQuizApp.Infra.Common;
 
 using Domain.Users;
-using Infra.Users.Routs;
 using Microsoft.AspNetCore.Components;
 
 public class ClientStateProvider(
@@ -17,18 +16,18 @@ public class ClientStateProvider(
     : AuthenticationStateProvider
 {
 
-private Task<AuthenticationState> _authenticationStateTask  = Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+    private Task<AuthenticationState> _authenticationStateTask  = Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
 
 
-public LoggedUser? LoggedUser { get; private set; }
-public bool IsLoggedIn => LoggedUser != null;
-public bool IsInitialized = false;
-private static readonly SemaphoreSlim Semaphore = new(1, 1);
+    public LoggedUser? LoggedUser { get; private set; }
+    public bool IsLoggedIn => LoggedUser != null;
+    public bool IsInitialized = false;
+    private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
 
     public async Task<ClaimsPrincipal> GetAuthenticationStateProviderUserAsync()
     {
-        var state = await GetAuthenticationStateAsync();
+        var state                           = await GetAuthenticationStateAsync();
         var authenticationStateProviderUser = state.User;
         return authenticationStateProviderUser;
     }
@@ -48,7 +47,7 @@ private static readonly SemaphoreSlim Semaphore = new(1, 1);
         LoggedUser = result.Token;
 
         
-         SetAuthenticatedUser(result.Token);
+        SetAuthenticatedUser(result.Token);
         NotifyAuthenticationStateChanged(_authenticationStateTask);
 
         return result;

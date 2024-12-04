@@ -101,7 +101,7 @@
                                             {
                                                 builder.OpenComponent<MudTextField<string>>(0);
                                                 builder.AddAttribute(1, "Label",        "Category Name");
-                                                builder.AddAttribute(2, "Value",        updatedCategory.Name);
+                                                builder.AddAttribute(2, "bind-Value",        updatedCategory.Name);
                                                 builder.AddAttribute(3, "ValueChanged", EventCallback.Factory.Create<string>(this, value => updatedCategory = new UpdateCategoryDto(value)));
                                                 builder.CloseComponent();
                                             })
@@ -142,7 +142,7 @@
                                             {
                                                 builder.OpenComponent<MudTextField<string>>(0);
                                                 builder.AddAttribute(1, "Label",        "Category Name");
-                                                builder.AddAttribute(2, "Value",        updatedCategory.Name);
+                                                builder.AddAttribute(2, "bind-Value",        updatedCategory.Name);
                                                 builder.AddAttribute(3, "ValueChanged", EventCallback.Factory.Create<string>(this, value => updatedCategory = new CreateCategoryDto(value)));
                                                 builder.CloseComponent();
                                             })

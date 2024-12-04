@@ -1,4 +1,7 @@
-﻿@using MudBlazor
+﻿@page "/Login"
+@using MyQuizApp.Shared.Components.Layout
+@using MyQuizApp.Shared.Components.Users.Auth
+@layout AuthLayout
 
 <MudContainer MaxWidth="MaxWidth.Small" Class="d-flex justify-center align-center min-h-100vh">
     <MudCard Class="p-4" Style="width: 100%;">
@@ -40,17 +43,27 @@
 @code{
     [SupplyParameterFromForm(FormName = "LoginForm")]
     private LoginRequests Requests { get; set; } = new LoginRequests();
-    [Parameter]public string? Errors { get; set; } = null!;
+    private string Errors { get; set; } = null!;
 
-    [Parameter] public EventCallback<LoginRequests> Callback { get; set; }
 
+    protected override void OnInitialized()
+    {
+        if (AuthState.IsLoggedIn)
+            NavigationManager.NavigateTo("/", replace: true, forceLoad: true);
+    }
 
     private async Task LoginAsync(EditContext arg)
     {
-        if (Requests is not null)
-            await Callback.InvokeAsync(Requests);
-        else
-            Errors = "Fill pls ";
+        var result = await AuthState.LoginAsync(Requests);
+
+        if (result.HasError)
+        {
+            Errors = result.Error ?? "";
+            StateHasChanged();
+            return;
+        }
+
+        NavigationManager.NavigateTo("/");
     }
 
 }

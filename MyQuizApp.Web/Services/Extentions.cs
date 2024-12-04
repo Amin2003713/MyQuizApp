@@ -5,6 +5,8 @@ using Refit;
 
 namespace MyQuizApp.Web.Services;
 
+using Infra.Common;
+
 public static class Extentions
 {
     public static void AddRefitConfig(this IServiceCollection services)

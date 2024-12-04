@@ -5,7 +5,7 @@
 @inject   NavigationManager NavigationManager
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
-
+@inject ClientStateProvider AuthState
 
 @using Blazored.LocalStorage
 @using Microsoft.AspNetCore.Components.Web
@@ -16,3 +16,4 @@
 @using MyQuizApp.Infra.Users.Requests
 @using MyQuizApp.Infra.Users.Response
 @using MudBlazor
+@using MyQuizApp.Infra.Common
