@@ -9,16 +9,9 @@
 
 <MudLayout Class="page">
     <MudMainContent>
-        @if (AuthState.IsInitialized)
-        {
-            <article class="content px-4">
+       <article class="content px-4">
                 @Body
             </article>
-        }
-        else
-        {
-            <div class="message"> Loading ....</div>
-        }
     </MudMainContent>
 </MudLayout>
 

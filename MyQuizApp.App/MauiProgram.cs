@@ -2,19 +2,32 @@
 
 namespace MyQuizApp.App;
 
+
 using Blazored.LocalStorage;
 using Infra.Common;
 using Infra.Services;
+using Infra.Users;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
+using Refit;
 using Services;
-using Web.Services;
+#if ANDROID
+using System.Security.Cryptography.X509Certificates;
+using Xamarin.Android.Net;
+using System.Net.Security;
+#endif
+
 
 public static class MauiProgram
 {
 	public static MauiApp CreateMauiApp()
 	{
 		var builder = MauiApp.CreateBuilder();
+
+
+			builder.Services.AddSingleton<IAppState, AppState>();
+
+
 		builder
 			.UseMauiApp<App>()
 			.ConfigureFonts(fonts =>
@@ -27,14 +40,7 @@ public static class MauiProgram
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		builder.Logging.AddDebug();
-		AppDomain.CurrentDomain.UnhandledException += (s, e) =>
-		                                                {
-			                                                System.Diagnostics.Debug.WriteLine(
-				                                                "********** OMG! FirstChanceException **********");
-			                                                System.Diagnostics.Debug.WriteLine(e);
-		                                                };
 #endif
-
 		builder.Services.AddSingleton<ILocalStorage ,MauiLocalStorage >();
 		builder.Services.AddMudServices();
 		builder.Services.AddCascadingAuthenticationState();
@@ -43,9 +49,43 @@ public static class MauiProgram
 		builder.Services.AddSingleton<AuthenticationStateProvider>(
 			provider => provider.GetRequiredService<ClientStateProvider>());
 		builder.Services.AddSingleton<IFormFactor, FormFactor>();
-		builder.Services.AddRefitConfig();
+
+		builder.Services.AddRefitConfig(CreateRefitSettings());
 
 
 		return builder.Build();
 	}
+
+
+	private static RefitSettings CreateRefitSettings()
+    {
+	    return new RefitSettings()
+	    {
+		           
+// 		     HttpMessageHandlerFactory = () =>
+// 		                                  {
+// #if ANDROID
+// 												var android =  new AndroidMessageHandler
+//                                                   {
+//                                                       ServerCertificateCustomValidationCallback =
+//                                                           (_, cert, chain, sslPolicyErrors) =>
+//                                                               cert?.Issuer    == "CN=localhost" ||
+//                                                               sslPolicyErrors == SslPolicyErrors.None
+//                                                   };
+//
+//                                                   return android;
+// #elif IOS
+//                                                   var iosHandler = new NSUrlSessionHandler();
+//                                                   iosHandler.TrustOverrideForUrl = (sender, url, trust) =>
+//                                                       url.StartsWith(Extentions.BaseUrl, StringComparison.OrdinalIgnoreCase);
+//                                                   return iosHandler;
+// #endif
+// 			                                  return new HttpClientHandler();
+// 		                                  }
+	    };
+    }
+
 }
+
+
+

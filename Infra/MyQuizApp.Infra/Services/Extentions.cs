@@ -1,68 +1,55 @@
-using MyQuizApp.Infra.Categories;
-using MyQuizApp.Infra.Quiezzes;
-using MyQuizApp.Infra.Users;
-using Refit;
-
-namespace MyQuizApp.Web.Services;
+namespace MyQuizApp.Infra.Services;
 
 using System.Net.Security;
-using Infra.Common;
-using Infra.Services;
+using Categories;
+using Common;
 using Microsoft.Extensions.DependencyInjection;
+using Quiezzes;
+using Refit;
+using Users;
 
 
 public static class Extentions
 {
-    private static readonly string BaseUrl = OperatingSystem.IsBrowser()
+    public static readonly string BaseUrl = OperatingSystem.IsBrowser()
         ? ("http://localhost:5193")
         : ("http://10.0.2.2:5193");
 
-    public static void AddRefitConfig(this IServiceCollection services )
+    public static void AddRefitConfig(
+        this IServiceCollection services
+        , RefitSettings refitSettings = null!)
     {
 
-        services.AddRefitClient<IUserApiClient>(CreateRefitSettings).
-            ConfigureHttpClient(ConfigureHttpClient);
+        try
+        {
+            services.AddRefitClient<IUserApiClient>(refitSettings).
+                     ConfigureHttpClient(ConfigureHttpClient);
 
 
-        services.AddRefitClient<ICategoryApi>(CreateRefitSettings).
-            ConfigureHttpClient(ConfigureHttpClient);
+            services.AddRefitClient<ICategoryApi>(provider => SetAuth(provider, refitSettings)).
+                     ConfigureHttpClient(ConfigureHttpClient);
 
-        services.AddRefitClient<IQuizApi>(CreateRefitSettings).
-                 ConfigureHttpClient(ConfigureHttpClient);
+            services.AddRefitClient<IQuizApi>(provider => SetAuth(provider, refitSettings)).
+                     ConfigureHttpClient(ConfigureHttpClient);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
-    private static RefitSettings CreateRefitSettings(IServiceProvider provider)
+    private static RefitSettings? SetAuth( IServiceProvider provider , RefitSettings? refitSettings)
     {
         var token = provider.GetRequiredService<ClientStateProvider>();
 
-        return new RefitSettings()
-        {
-            AuthorizationHeaderValueGetter = (_, _) => Task.FromResult(token.LoggedUser?.Token ?? "") ,
-            HttpMessageHandlerFactory = () =>
-                                        {
-                                            if (OperatingSystem.IsAndroid())
-                                            {
-                                                var android = new Xamarin.Android.Net.AndroidMessageHandler();
-                                                android.ServerCertificateCustomValidationCallback
-                                                    = (_, cert, chain, sslPolicyErrors) =>
-                                                          cert.Issuer        == "CN==localhost"
-                                                          || sslPolicyErrors == SslPolicyErrors.None;
+        refitSettings ??= new RefitSettings();
 
-                                                return android;
-                                            }
-                                            else if (OperatingSystem.IsIOS())
-                                            {
-                                                var msUilSession = new NSUrlSessionHandler();
-                                                msUilSession.TrustOverrideForUrl = (sender, url, trust)
-                                                        => url.StartsWith(BaseUrl);
+        refitSettings.AuthorizationHeaderValueGetter = (_, _) => Task.FromResult(token.LoggedUser?.Token ?? "");
 
-                                                return msUilSession;
-                                            }
-
-                                            return default!;
-                                        }
-        };
+        return refitSettings;
     }
+
 
     private static void ConfigureHttpClient(HttpClient client)
     {

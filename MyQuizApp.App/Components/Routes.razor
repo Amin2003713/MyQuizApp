@@ -1,10 +1,15 @@
-﻿<Router AppAssembly="@typeof(MauiProgram).Assembly"
+﻿@using MyQuizApp.Shared.Components.Common
+
+<Router AppAssembly="@typeof(MauiProgram).Assembly"
         AdditionalAssemblies="new[] { typeof(MyQuizApp.Shared.Components._Imports).Assembly }">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)"/>
+        <FocusOnNavigate RouteData="@routeData" Selector="h1"/>
     </Found>
 </Router>
+
+<Loader/>
+
 
 
 @code

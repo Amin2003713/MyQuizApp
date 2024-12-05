@@ -8,6 +8,7 @@
 @using MyQuizApp.Infra.Users.Response
 @using MudBlazor
 @using MyQuizApp.Infra.Common
+@using MyQuizApp.Infra.Services
 
 @inject    ICategoryApi CategoryApi
 @inject    IQuizApi QuizApi
@@ -17,3 +18,4 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject ClientStateProvider AuthState
+@inject IAppState AppState

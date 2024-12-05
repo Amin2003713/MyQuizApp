@@ -1,0 +1,26 @@
+@using MyQuizApp.Infra.Services
+
+
+<MudOverlay
+        DarkBackground
+        ZIndex="9999"
+        AutoClose="false"
+        bind-Visible="AppState.IsLoading"
+        LockScroll
+        Absolute>
+
+        <MudProgressCircular
+            Color="Color.Tertiary"
+            Style="height:25%;width:25%;"
+            Indeterminate
+            Size="Size.Large"  />
+
+    </MudOverlay>
+
+
+@code {
+    protected override void OnInitialized()
+    {
+        AppState.OnChange += StateHasChanged;
+    }
+}

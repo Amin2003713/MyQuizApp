@@ -15,6 +15,7 @@ public class ClientStateProvider(
     ILocalStorage storageService,
     IUserApiClient userApiClient ,
     NavigationManager navigationManager,
+    IAppState appState,
     IFormFactor formFactor)
     : AuthenticationStateProvider
 {
@@ -24,7 +25,6 @@ public class ClientStateProvider(
 
     public LoggedUser? LoggedUser { get; private set; }
     public bool IsLoggedIn => LoggedUser != null;
-    public bool IsInitialized = false;
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
 
@@ -41,23 +41,38 @@ public class ClientStateProvider(
 
     public  async Task<LoginResponse> LoginAsync(LoginRequests requests)
     {
-        var result  = await userApiClient.Login(requests);
+        try
+        {
+            appState.ShowLoader();
 
-        if (result.HasError)
+            var result = await userApiClient.Login(requests);
+
+            if (result.HasError)
+                return result;
+
+            await storageService.SetItemAsync(UserConst.UserInfo, result.Token);
+            LoggedUser = result.Token;
+
+
+            SetAuthenticatedUser(result.Token);
+            NotifyAuthenticationStateChanged(_authenticationStateTask);
+
+            appState.HideLoader();
+
             return result;
-
-        await storageService.SetItemAsync(UserConst.UserInfo, result.Token);
-        LoggedUser = result.Token;
-
-        
-        SetAuthenticatedUser(result.Token);
-        NotifyAuthenticationStateChanged(_authenticationStateTask);
-
-        return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            appState.HideLoader();
+            return default!;
+        }
     }
 
     public async Task LogoutAsync()
     {
+        appState.ShowLoader();
+
         if(IsLoggedIn)
         {
             LoggedUser = null;
@@ -66,12 +81,14 @@ public class ClientStateProvider(
 
         RemoveAuthenticatedUser();
         NotifyAuthenticationStateChanged(_authenticationStateTask);
+        appState.HideLoader();
+
     }
 
     public async Task SetAuthenticatedUser()
     {
-        try
-        {
+
+            appState.ShowLoader();
             await Semaphore.WaitAsync();
             try
             {
@@ -98,16 +115,10 @@ public class ClientStateProvider(
             }
             finally
             {
-                IsInitialized = true;
                 NotifyAuthenticationStateChanged(_authenticationStateTask);
                 Semaphore.Release(); // Release the lock
+                appState.HideLoader();
             }
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
     }
 
 

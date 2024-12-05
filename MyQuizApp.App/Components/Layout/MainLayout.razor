@@ -9,34 +9,13 @@
 <MudSnackbarProvider/>
 
 <MudLayout Class="page">
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
-                       OnClick="@((e) => DrawerToggle())"/>
-        Quiz App
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h5" Class="mt-1">
-                <MudLink
-                    Underline="Underline.None"
-                    OnClick="@(() => NavigationManager.NavigateTo(AuthState.LoggedUser?.UserRoles == UserRoles.Student ? "/Student/Home" : "/"))">
-                    Quiz App
-                </MudLink>
-            </MudText>
-        </MudDrawerHeader>
-        <NavMenu/>
-    </MudDrawer>
+    <NavMenu/>
     <MudMainContent>
-        @if (AuthState.IsInitialized)
-        {
-            <article class="content px-4">
-                @Body
-            </article>
-        }
-        else
-        {
-            <div class="message"> Loading ....</div>
-        }
+
+        <article class="content px-4">
+            @Body
+        </article>
+
     </MudMainContent>
 </MudLayout>
 

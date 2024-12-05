@@ -50,13 +50,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine(Guid.CreateVersion7());
-
+AppState.ShowLoader();
         var result = await CategoryApi.GetAllCategoriesAsync();
         if (result.IsSuccess)
             Categories = result.Data.AsQueryable();
         else
             Errors = result.Error;
+AppState.HideLoader();
     }
 
 
@@ -78,7 +78,7 @@
         if (modalResult.Data == Guid.Empty)
             return;
 
-
+        AppState.ShowLoader();
         var result = await CategoryApi.DeleteCategoryAsync(modalResult.Data);
         if (!result.IsSuccess)
         {
@@ -87,6 +87,7 @@
         }
 
         await OnInitializedAsync();
+
     }
 
 
@@ -119,6 +120,8 @@
 
         if (!modalResult.IsSuccess)
             return;
+
+        AppState.ShowLoader();
 
         var apiResult = await CategoryApi.UpdateCategoryAsync(context.Id, modalResult.Data);
 
