@@ -1,48 +1,98 @@
 ﻿@using MudBlazor
 @using MyQuizApp.Domain.Users
 
-
-<MudNavMenu>
+<MudAppBar
+    Dense
+    Fixed
+    Elevation="2"
+    Color="Color.Transparent"
+    WrapContent
+    Gutters
+>
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="ToggleDrawer" Color="Color.Inherit" Edge="Edge.Start"/>
+    <MudSpacer/>
     <AuthorizeView>
         <Authorized>
-            <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
-                <Authorized Context="_">
-                    <MudNavLink href="/" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
-                    <MudNavLink href="/Admins/Quiz/ManageQuizzes" Match="NavLinkMatch.Prefix">Manage Quizzes</MudNavLink>
-                    <MudNavLink href="/Admin/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">See Student Result</MudNavLink>
-                    <MudNavLink href="/Admins/Categories/ManageCategories" Match="NavLinkMatch.Prefix">Manage Categories</MudNavLink>
-
-
-                    <MudNavGroup Title="Settings">
-                        <MudNavLink Href="/Admin/Student/StudentList" Match="NavLinkMatch.Prefix">Users</MudNavLink>
-                        <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
-                    </MudNavGroup>
-                </Authorized>
-            </AuthorizeView>
-
-            <AuthorizeView Roles="@(UserRoles.Student.ToString())">
-                <Authorized Context="_">           
-
-                    <MudNavLink href="/Student/Home" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
-                    <MudNavLink href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">My Quizzes</MudNavLink>
-                    <MudNavLink href="/Student/Categories/ListCategories" Match="NavLinkMatch.Prefix">Get All Categories</MudNavLink>
-
-                </Authorized>
-            </AuthorizeView>
-            
+            <MudTooltip
+                Text="@($"welcome {(AuthState?.LoggedUser?.UserRoles == UserRoles.Admin ? "Admin" : "Sudent")}: {AuthState?.LoggedUser?.Name} ")">
+                <MudAvatar Color="Color.Success" Variant="Variant.Outlined">@(AuthState?.LoggedUser?.Name)</MudAvatar>
+            </MudTooltip>
         </Authorized>
     </AuthorizeView>
 
-    
+</MudAppBar>
+<MudDrawer
+    @bind-Open="@_open" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary"
+    OverlayAutoClose ClipMode="DrawerClipMode.Docked" OpenMiniOnHover>
+    <MudDrawerHeader Dense>
+        <MudText Typo="Typo.h6" Align="Align.Center">
+            My Quiz App
+        </MudText>
+    </MudDrawerHeader>
+    <MudNavMenu Dense Rounded Margin="Margin.Dense">
+        <AuthorizeView>
+            <Authorized>
+                <AuthorizeView Roles="@(UserRoles.Admin.ToString())">
+                    <Authorized Context="_">
+                        <MudNavLink href="/" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+                        <MudNavLink href="/Admins/Quiz/ManageQuizzes" Match="NavLinkMatch.Prefix">Manage Quizzes
+                        </MudNavLink>
+                        <MudNavLink href="/Admin/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">See Student Result
+                        </MudNavLink>
+                        <MudNavLink href="/Admins/Categories/ManageCategories" Match="NavLinkMatch.Prefix">Manage
+                            Categories
+                        </MudNavLink>
 
-    <MudNavLink OnClick="@(async () =>
-                           {
-                               await AuthState.LogoutAsync();
-                               NavigationManager.NavigateTo("/login", replace: true);
-                           })" Match="NavLinkMatch.Prefix">Logout</MudNavLink>
 
-</MudNavMenu>
+                        <MudNavGroup Title="Settings">
+                            <MudNavLink Href="/Admin/Student/StudentList" Match="NavLinkMatch.Prefix">Users</MudNavLink>
+                            <MudNavLink Href="/security" Match="NavLinkMatch.Prefix">Security</MudNavLink>
+                        </MudNavGroup>
+                    </Authorized>
+                </AuthorizeView>
 
+                <AuthorizeView Roles="@(UserRoles.Student.ToString())">
+                    <Authorized Context="_">
+
+                        <MudNavLink href="/Student/Home" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
+                        <MudNavLink href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">My Quizzes</MudNavLink>
+                        <MudNavLink href="/Student/Categories/ListCategories" Match="NavLinkMatch.Prefix">Get All
+                            Categories
+                        </MudNavLink>
+
+                    </Authorized>
+                </AuthorizeView>
+
+                <MudNavLink OnClick="@(async () =>
+                                       {
+                                           await AuthState.LogoutAsync();
+                                           NavigationManager.NavigateTo("/login", replace: true);
+                                       })" Match="NavLinkMatch.Prefix">Logout
+                </MudNavLink>
+
+
+            </Authorized>
+        </AuthorizeView>
+
+    </MudNavMenu>
+</MudDrawer>
+
+
+
+
+
+@code
+
+
+
+{
+    private bool _open = false;
+
+    private void ToggleDrawer()
+    {
+        _open = !_open;
+    }
+}
 
 
 

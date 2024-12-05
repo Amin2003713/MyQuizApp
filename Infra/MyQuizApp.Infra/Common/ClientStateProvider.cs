@@ -50,6 +50,13 @@ public class ClientStateProvider(
             if (result.HasError)
                 return result;
 
+            var a = OperatingSystem.IsBrowser(); 
+            var aa = OperatingSystem.IsAndroid(); 
+            var aas = OperatingSystem.IsWindows(); 
+
+            if (OperatingSystem.IsBrowser() && result.Token.UserRoles == UserRoles.Admin)
+                return new LoginResponse(null!, "Admin connat use the application", true);
+
             await storageService.SetItemAsync(UserConst.UserInfo, result.Token);
             LoggedUser = result.Token;
 

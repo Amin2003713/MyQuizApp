@@ -1,35 +1,50 @@
 ﻿@using MudBlazor
 @using MyQuizApp.Domain.Users
+<MudAppBar 
+    Dense
+    Fixed
+    Elevation="2"
+    Color="Color.Transparent"
+    WrapContent
+    Gutters
+    >
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" OnClick="ToggleDrawer" Color="Color.Inherit" Edge="Edge.Start"/>
+    <MudSpacer/>
+    <MudTooltip
+        Text="@($"welcome {(AuthState?.LoggedUser?.UserRoles == UserRoles.Admin ? "Admin" : "Sudent")}: {AuthState?.LoggedUser?.Name} ")">
+        <MudAvatar Color="Color.Success" Variant="Variant.Outlined">@(AuthState?.LoggedUser?.Name)</MudAvatar>
+    </MudTooltip>
+
+</MudAppBar>
+<MudDrawer 
+    @bind-Open="@_open" Anchor="Anchor.Start" Elevation="1" Variant="@DrawerVariant.Temporary"
+           OverlayAutoClose ClipMode="DrawerClipMode.Docked" OpenMiniOnHover>
+    <MudDrawerHeader Dense>
+        <MudText Typo="Typo.h6" Align="Align.Center">
+            My Quiz App
+        </MudText>
+    </MudDrawerHeader>
+    <MudNavMenu Dense Rounded Margin="Margin.Dense">
+        <MudNavLink Icon="@Icons.Material.Rounded.Dashboard" href="/Student/Home" Match="NavLinkMatch.Prefix">
+            Dashboard
+        </MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Rounded.Newspaper" href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">
+            My Quizzes
+        </MudNavLink>
+        @if (AuthState.IsLoggedIn)
+        {
+            <MudNavLink OnClick="@(async () =>
+                                   {
+                                       await AuthState.LogoutAsync();
+                                       NavigationManager.NavigateTo("/login", replace: true);
+                                   })" Match="NavLinkMatch.Prefix">Logout
+            </MudNavLink>
+        }
+    </MudNavMenu>
+</MudDrawer>
 
 
-<MudPaper Height="100%" Style="overflow:hidden; position:relative;">
-    <MudDrawerContainer Class="mud-height-full">
-        <MudDrawer @bind-Open="@_open" Fixed="false" Elevation="1" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
-            <MudNavMenu>
-                <MudNavLink Icon="@Icons.Material.Rounded.Dashboard" href="/Student/Home" Match="NavLinkMatch.Prefix">Dashboard</MudNavLink>
-                <MudNavLink Icon="@Icons.Material.Rounded.Newspaper" href="/Student/Quiz/MyQuizzes" Match="NavLinkMatch.Prefix">My Quizzes</MudNavLink>
-            </MudNavMenu>
-        </MudDrawer>
-        <div class="d-flex justify-center align-center mud-height-full">
-            <MudButton OnClick="@ToggleDrawer" Color="Color.Primary">Toggle</MudButton>
-        </div>
-    </MudDrawerContainer>
-</MudPaper>
 
-<MudNavMenu>
-
-
-  
-
-
-    <MudNavLink OnClick="@(async () =>
-                           {
-                               await AuthState.LogoutAsync();
-                               NavigationManager.NavigateTo("/login", replace: true);
-                           })" Match="NavLinkMatch.Prefix">Logout
-    </MudNavLink>
-
-</MudNavMenu>
 
 
 @code
