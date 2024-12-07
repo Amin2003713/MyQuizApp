@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-
+﻿
 namespace MyQuizApp.App;
 
 
+using Microsoft.Extensions.Logging;
 using Blazored.LocalStorage;
 using Infra.Common;
 using Infra.Services;
@@ -11,11 +11,13 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using Refit;
 using Services;
+
 #if ANDROID
 using System.Security.Cryptography.X509Certificates;
 using Xamarin.Android.Net;
 using System.Net.Security;
 #endif
+
 
 
 public static class MauiProgram
@@ -26,16 +28,14 @@ public static class MauiProgram
 
 
 			builder.Services.AddSingleton<IAppState, AppState>();
+			builder.Services.AddMauiBlazorWebView();
 
-
-		builder
-			.UseMauiApp<App>()
-			.ConfigureFonts(fonts =>
-			{
-				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-			});
-
-		builder.Services.AddMauiBlazorWebView();
+			builder.UseMauiApp<App>().
+			        ConfigureFonts(
+				        fonts =>
+				        {
+					        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+				        });
 
 #if DEBUG
 		builder.Services.AddBlazorWebViewDeveloperTools();
@@ -53,37 +53,45 @@ public static class MauiProgram
 		builder.Services.AddRefitConfig(CreateRefitSettings());
 
 
+#if ANDROID
+			builder.Services.Add_Android();
+#elif IOS
+		builder.Services.Add_IOS();
+#elif MACCATALYST
+			builder.Services.Add_Mac();
+#elif WINDOWS
+		builder.Services.Add_Windows();
+#endif
+
 		return builder.Build();
 	}
 
 
-	private static RefitSettings CreateRefitSettings()
-    {
-	    return new RefitSettings()
-	    {
-		           
-// 		     HttpMessageHandlerFactory = () =>
-// 		                                  {
-// #if ANDROID
-// 												var android =  new AndroidMessageHandler
-//                                                   {
-//                                                       ServerCertificateCustomValidationCallback =
-//                                                           (_, cert, chain, sslPolicyErrors) =>
-//                                                               cert?.Issuer    == "CN=localhost" ||
-//                                                               sslPolicyErrors == SslPolicyErrors.None
-//                                                   };
-//
-//                                                   return android;
-// #elif IOS
-//                                                   var iosHandler = new NSUrlSessionHandler();
-//                                                   iosHandler.TrustOverrideForUrl = (sender, url, trust) =>
-//                                                       url.StartsWith(Extentions.BaseUrl, StringComparison.OrdinalIgnoreCase);
-//                                                   return iosHandler;
-// #endif
-// 			                                  return new HttpClientHandler();
-// 		                                  }
-	    };
-    }
+
+
+
+
+	private static RefitSettings CreateRefitSettings() 
+		=> new();
+
+
+	private static void Add_Android(this IServiceCollection services)
+	{
+	}
+
+
+	// ReSharper disable once InconsistentNaming
+	private static void Add_IOS(this IServiceCollection services)
+	{
+	}
+
+	private static void Add_Mac(this IServiceCollection services)
+	{
+	}
+
+	private static void Add_Windows(this IServiceCollection services)
+	{
+	}
 
 }
 
